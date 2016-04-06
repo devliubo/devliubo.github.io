@@ -1,0 +1,661 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="runtime," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Message Forwarding">
+<meta property="og:url" content="http://devliubo.com/2015/2015-05-07-message-forwarding.html">
+<meta property="og:site_name" content="Devliubo">
+<meta property="og:description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
+<meta property="og:updated_time" content="2016-04-02T17:45:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Message Forwarding">
+<meta name="twitter:description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'devliubo'
+    }
+  };
+</script>
+
+  <title> Message Forwarding | Devliubo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-64909752-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Devliubo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Message Forwarding
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-05-07T22:44:00+08:00" content="2015-05-07">
+              2015-05-07
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/2015-05-07-message-forwarding.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/2015-05-07-message-forwarding.html" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~</p>
+<a id="more"></a>
+<p>iOS中采用给对象发送消息的方式去调用函数，并且消息和方法的实现并不在编译时被绑定到一起，而是在运行时去寻找对应的方法实现</p>
+<p>从objc_msgSend()说起，当给一个对象发送消息时</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[receiver message:arg];</span><br></pre></td></tr></table></figure>
+<p>会被编译器转换成C形式的函数调用</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objc_msgSend(receiver, @selecter(message), arg);</span><br></pre></td></tr></table></figure>
+<p>如官方文档所说:</p>
+<blockquote>
+<p>The messaging function does everything necessary for dynamic binding:</p>
+<p>It first finds the procedure (method implementation) that the selector refers to. Since the same method can be implemented differently by separate classes, the precise procedure that it finds depends on the class of the receiver.</p>
+<p>It then calls the procedure, passing it the receiving object (a pointer to its data), along with any arguments that were specified for the method.</p>
+<p>Finally, it passes on the return value of the procedure as its own return value.</p>
+</blockquote>
+<p>其中第一步的查找过程主要包含以下几个步骤：</p>
+<ol>
+<li><p>检查receiver是否为nil</p>
+</li>
+<li><p>去receiver对应的class中去查找<strong>@selecter(message)</strong>所对应的<strong>IMP</strong></p>
+<p> a.首先沿着receiver的<strong>isa</strong>指针去到receiver对应的class的cache(isa中的cache)中查找，如果找到，则调用对应的IMP</p>
+<p> b.如果在cache中没有找到，则到class的<strong>dispatch table</strong>中去查找，找到则调用</p>
+<p> c.如果没有找到，则沿着<strong>isa</strong>的<strong>super_class</strong>去到<strong>superclass</strong>中去查找</p>
+<p> d.如此沿着继承链查找下去，直到查找到NSObject中，当找到时则调用</p>
+</li>
+<li><p>如果依旧没有找到，则runtime会调用类的方法:</p>
+<p> <strong>+ (BOOL)resolveInstanceMethod:(SEL)sel;</strong></p>
+<p> 或者<strong>+ (BOOL)resolveClassMethod:(SEL)sel;</strong></p>
+<p> 可以在这两个方法中向类中添加selecter所对应的IMP，并返回YES</p>
+</li>
+<li><p>如果经过上面的三步没有得到对应的IMP，则会触发MessageForwarding机制，runtime会调用类的方法:</p>
+<p> <strong>- (id)forwardingTargetForSelector:(SEL)aSelector;</strong></p>
+<p> 在这个方法中可以将，message转发给另外一个对象(在该方法中返回self会死循环)，去另外的对象中查找对应的IMP</p>
+</li>
+<li><p>经过上面的步骤都没有得到，则runtime会调用方法:</p>
+<p> <strong>- (void)forwardInvocation:(NSInvocation *)anInvocation;</strong></p>
+<p> 做最后的尝试，该方法默认调用方法:</p>
+<p> <strong>- (void)doesNotRecognizeSelector:(SEL)aSelector;</strong></p>
+<p> 抛出一个<strong><em>NSInvalidArgumentException</em></strong>异常(Ps:doseNotRecognizeSelector:方法还可以用于阻止继承某些方法)</p>
+<p> 可以在这个方法中去寻找可以响应消息的对象，之后通过改变<strong>NSInvocation</strong>的<strong>target</strong>去转发消息</p>
+<blockquote>
+<p><strong>需要注意:</strong>在该方法调用前，为了生成message对应的NSInvocation，需要重载方法:</p>
+<p><strong>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;</strong></p>
+<p>去生成selector对应的方法签名</p>
+<p>因为包含了生成方法签名和NSInvocation的过程，所以被形容为比forwardingTargetForSelecter:代价更大</p>
+</blockquote>
+</li>
+<li><p>如果使用Message Forwarding，除了上面的几个方法外，还需要注意在必要时重载一些相关的方法等等:</p>
+<p> <strong>+ (IMP)instanceMethodForSelector:(SEL)aSelector;</strong></p>
+<p> <strong>- (BOOL)respondsToSelector:(SEL)aSelector;</strong></p>
+<p> <strong>+ (BOOL)instancesRespondToSelector:(SEL)aSelector;</strong></p>
+<p> <strong>- (BOOL)conformsToProtocol:(Protocol *)aProtocol;</strong></p>
+<p> <strong>- (BOOL)isKindOfClass:(Class)aClass;</strong></p>
+</li>
+</ol>
+<p><a href="https://git.oschina.net/bomylib/MessageForwarding.git" target="_blank" rel="external">OSChina:MessageForwarding</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/runtime/" rel="tag">#runtime</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html" rel="next" title="配置git多SSH-Key共存">
+                <i class="fa fa-chevron-left"></i> 配置git多SSH-Key共存
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-06-28-applewatchde-yi-xie-zong-jie.html" rel="prev" title="AppleWatch的一些总结">
+                AppleWatch的一些总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="devliubo" />
+          <p class="site-author-name" itemprop="name">devliubo</p>
+          <p class="site-description motion-element" itemprop="description">Keep Learning</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liubo_lb" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">devliubo</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'devliubo';
+      var disqus_identifier = '2015/2015-05-07-message-forwarding.html';
+      var disqus_title = 'Message Forwarding';
+      var disqus_url = 'http://devliubo.com/2015/2015-05-07-message-forwarding.html';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

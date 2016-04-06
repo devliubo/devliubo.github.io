@@ -1,0 +1,716 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="AppleWatch," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AppleWatch的一些总结">
+<meta property="og:url" content="http://devliubo.com/2015/2015-06-28-applewatchde-yi-xie-zong-jie.html">
+<meta property="og:site_name" content="Devliubo">
+<meta property="og:description" content="经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~">
+<meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/TargetStructure.png">
+<meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/WatchAndiPhone.png">
+<meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/HiddenAndAlpha.png">
+<meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/LifeCycle1.png">
+<meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/LifeCycle2.png">
+<meta property="og:updated_time" content="2016-04-02T18:03:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AppleWatch的一些总结">
+<meta name="twitter:description" content="经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~">
+<meta name="twitter:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/TargetStructure.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'devliubo'
+    }
+  };
+</script>
+
+  <title> AppleWatch的一些总结 | Devliubo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-64909752-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Devliubo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                AppleWatch的一些总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-06-28T18:26:00+08:00" content="2015-06-28">
+              2015-06-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/2015-06-28-applewatchde-yi-xie-zong-jie.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/2015-06-28-applewatchde-yi-xie-zong-jie.html" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~</p>
+<a id="more"></a>
+<h2 id="Target-Structure"><a href="#Target-Structure" class="headerlink" title="Target Structure"></a>Target Structure</h2><p>一个AppleWatch要求必须要有一个与其配对的iPhone才可以使用，要做AppleWatch的开发工作，首先需要明白WatchKit App与iOS App之间的结构关系</p>
+<p><img src="/images/2015-06-28-applewatchde-yi-xie-zong-jie/TargetStructure.png" alt="Target Structure" title="Target Structure"></p>
+<ol>
+<li><p>为一个iOS App添加了AppleWatch的Target后，会增加一个WatchKit Extension部分；WatchKit Extension包含两个部分：AppExtension部分，一个独立的WatchKit App部分；生成App的时候，WatchKit App会被包含到WatchKitExtension中，而WatchKitExtension会被包含到iOS App中，这三个部分将会打包生成一个ipa包</p>
+</li>
+<li><p>iOS App、WatchKit Extension、WatchKit App是三个可运行部分，每个有其独立的BundleIdentifier</p>
+</li>
+<li><p>iOS App、WatchKit Extension是运行在iPhone端的，各有其独立的沙盒，类似于两个App的样子，WatchKit App是运行在AppleWatch上的</p>
+</li>
+<li><p>就目前而言WatchKit App是纯粹的展示功能，相当于另外一个屏幕，苹果处于多方面的考虑，将其业务逻辑和交互处理完全放到WatchKitExtension中处理</p>
+</li>
+<li><p>当把一个App安装到iPhone上后，如果iPhone有配对的Apple Watch，iOS会负责将对应的WatchKit App部分安装到Apple Watch上</p>
+</li>
+</ol>
+<h2 id="数据共享和消息通讯"><a href="#数据共享和消息通讯" class="headerlink" title="数据共享和消息通讯"></a>数据共享和消息通讯</h2><p>前面说到，iOS App与WatchKit Extension是运行在两个不同的沙盒中的，因此他们之间的数据共享与消息通讯也就成为了开发过程中重要的一个环节，简单总结下</p>
+<ol>
+<li>首先来看iPhone与AppleWatch之间，这两个硬件之间的连接与数据传输是基于BLE的（传说也会用到Wifi），过程对开发者是透明的，完全由WatchKit负责<br><img src="/images/2015-06-28-applewatchde-yi-xie-zong-jie/WatchAndiPhone.png" alt="iPhone AppleWatch" title="iPhone AppleWatch"></li>
+<li>然后重点说一下在iPhone端，WatchKit Extension与iOS App之间的数据共享和消息通讯，官方介绍了两种方式可以用来在两者间通讯：</li>
+</ol>
+<p><strong>第一种：</strong>iOS在WatchKit的WKInterfaceController中提供了一个类方法:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="built_in">BOOL</span>)openParentApplication:(<span class="built_in">NSDictionary</span> *)userInfo reply:(<span class="keyword">void</span>(^)(<span class="built_in">NSDictionary</span> *replyInfo, <span class="built_in">NSError</span> *error))reply;</span><br></pre></td></tr></table></figure>
+<p>WatchKitExtension可以通过这个方法去向对应的iOSApp发送一个请求，第一个参数userInfo是一个Dictionary，可以根据需要去添加任意的内容，一般推荐与iOSApp端按照一定的约定去添加内容，第二个参数是一个block，这个block也有一个userInfo作为参数</p>
+<p>从iOS8.2开始，UIApplicationDelegate中增加了一个方法:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)application:(<span class="built_in">UIApplication</span> *)application handleWatchKitExtensionRequest:(<span class="built_in">NSDictionary</span> *)userInfo reply:(<span class="keyword">void</span>(^)(<span class="built_in">NSDictionary</span> *replyInfo))reply <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">8</span>_2);</span><br></pre></td></tr></table></figure>
+<p>WatchKitExtension发送来的请求将会在这个回调中收到，可以根据第二个参数userInfo所携带的内容进行相应地处理，之后将处理的结果放到一个Dictionary中，通过名为reply的Block返回给WatchKitExtension，从而完成了一次请求与相应</p>
+<blockquote>
+<p>对这个过程有三点需要注意：</p>
+<ul>
+<li><p>openParentApplication:reply的userInfo不可以为nil，为nil不会在iOSApp中收到请求</p>
+</li>
+<li><p>如果收到请求时，iOSApp没有启动，会使iOSApp以后台模式运行</p>
+</li>
+<li><p>如果WatchKitExtension快速连续的发送大量的请求，iOS会将所有的请求按发送顺序阻塞，直到前一个请求得到响应后，才会发送下一个</p>
+</li>
+</ul>
+</blockquote>
+<p><strong>第二种：</strong>需要借助App Group去共享数据，App Group相当于一个容器，他允许同一个Group内的不同App去在其中读写文件，通过这些文件，将数据在不同的App间实现共享</p>
+<p>可以通过NSFileManager去读写App Group中的文件，要获取App Group中文件的URL，可以使用NSFileManager的方法</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSURL</span> *)containerURLForSecurityApplicationGroupIdentifier:(<span class="built_in">NSString</span> *)groupIdentifier;</span><br></pre></td></tr></table></figure>
+<p>也可以使用CoreData去存储需要共享的数据</p>
+<p>也可以通过基于AppGroup的NSUserDefault去共享一些简单的用户偏好设置，如果需要共享的数据量比较多，还是推荐使用NSFileManager或者CoreData等方式去写入到文件，这样也可以将数据持久化存储</p>
+<p>这个方法麻烦的是需要去配置对App-Group的访问权限，首先需要为iOSApp与WatchKit Extension去创建对应的AppID，创建AppID时填写的BundleID不可以使用通配符*，必须是具体的BundleID，然后需要创建一个GroupID，最后需要更新Profiles文件将AppID与GroupID的访问权限关联起来，这样就可以在App中去访问AppGroup了</p>
+<p>也可以让Xcode去帮你完成上面的操作，需要在Xcode中登录你的AppleID，并且你的AppleID有开发者权限</p>
+<blockquote>
+<p><em>另外多说一个第三种：通过Handoff，使用Handoff的话需要将当前App的工作状态保存成为一个NSUserActivity，通过传递这个NSUserActivity去恢复工作状态，不过目前TBT并不支持工作状态的保存和恢复，所以没有很深入的使用，有机会再研究</em></p>
+</blockquote>
+<p><strong> &lt;&lt;&lt;一些改进办法&gt;&gt;&gt; </strong><br>以上就是官方建议的方法，但在实际的应用中发现并不是特别好用。首先第一种方法，目前的情况是只能从WatchKit Extension端发起请求，iOSApp端去响应请求，没有反向的方法去使用；第二种方法，仅仅使用NSFileManager的话，在一端写入文件后，另一端并不能马上获知发生了变更</p>
+<p>之后找到了另外的更好用的方法，简单说一下，第一种是使用NSFileCoordinator类和NSFilePresenter协议，首先来说通过NSFileCoordinator去读写文件是线程安全的，在不同的进程间读写共享的文件时，这点非常重要</p>
+<p>主要用到了NSFileCoordinator配合NSFileManager去读写文件，用到的需要方法有：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="keyword">void</span>)addFilePresenter:(<span class="keyword">id</span>&lt;<span class="built_in">NSFilePresenter</span>&gt;)filePresenter;</span><br><span class="line">+ (<span class="keyword">void</span>)removeFilePresenter:(<span class="keyword">id</span>&lt;<span class="built_in">NSFilePresenter</span>&gt;)filePresenter;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)coordinateReadingItemAtURL:(<span class="built_in">NSURL</span> *)url options:(<span class="built_in">NSFileCoordinatorReadingOptions</span>)options error:(<span class="built_in">NSError</span> **)outError byAccessor:(<span class="keyword">void</span> (^)(<span class="built_in">NSURL</span> *newURL))reader;</span><br><span class="line">- (<span class="keyword">void</span>)coordinateWritingItemAtURL:(<span class="built_in">NSURL</span> *)url options:(<span class="built_in">NSFileCoordinatorWritingOptions</span>)options error:(<span class="built_in">NSError</span> **)outError byAccessor:(<span class="keyword">void</span> (^)(<span class="built_in">NSURL</span> *newURL))writer;</span><br></pre></td></tr></table></figure>
+<p>同时需要一个遵循NSFilePresenter协议的对象，相当于一个观察者，当通过NSFileCoordinator完成写入文件后，便会在NSFilePresenter中受到通知：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)presentedItemDidChange;</span><br></pre></td></tr></table></figure>
+<p>从而获知文件发生了改变，可以进行相应的处理</p>
+<p>第二种是通过CFNotificationCenter，这个不同于NSNotificationCenter，平时使用最多的 NSNotificationCenter只能管理单进程内不同线程间的消息通讯，并不支持多进程间做通知，但CFNotificationCenter是支持的，因此可以用来处理iOSApp与WatchKitExtension之间的消息通讯</p>
+<p>当然，CFNotificationCenter只是起到一个通知的作用，真正的数据共享还是基于AppGroup的，需要通过NSFileManager或者CoreData等方式去传递数据</p>
+<p>github上又开源的库MMWormhole便是基于AppGroup和CFNotificationCenter，用起来会方便不少，有一点需要说明，MMWormhole库中的现有写入文件的方法，是没有权限在iPhone锁屏后写入文件的，如果项目中有需要的话，需要自己去重写写入文件的方法</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)writeMessageObject:(<span class="keyword">id</span>&lt;<span class="built_in">NSCoding</span>&gt;)messageObject forIdentifier:(<span class="built_in">NSString</span> *)identifier；</span><br></pre></td></tr></table></figure>
+<p>比如通过NSData的方法</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)writeToURL:(<span class="built_in">NSURL</span> *)url options:(<span class="built_in">NSDataWritingOptions</span>)writeOptionsMask error:(<span class="built_in">NSError</span> **)errorPtr;</span><br></pre></td></tr></table></figure>
+<p>去写入文件的话，需要指定写入权限 <strong><em>NSDataWritingFileProtectionCompleteUntilFirstUserAuthentication</em></strong></p>
+<h2 id="WatchKit-App布局"><a href="#WatchKit-App布局" class="headerlink" title="WatchKit App布局"></a>WatchKit App布局</h2><ol>
+<li><p>WatchKitApp的界面开发与iOSApp是不同的，在WatchKitApp中，是只支持通过StoryBoard去编辑和设计UI的，是完全依赖StoryBoard的，可以在StoryBoard中去安排界面上控件的排列顺序，大小，位置，属性，以及设置用户交互的响应事件</p>
+</li>
+<li><p>在WatchKitApp中界面是没有层级关系的，所有的控件均会在同一层级，根据开发者在StoryBoard中的设计按顺序排列，实现和iOSApp类似的复杂布局会很困难</p>
+</li>
+<li><p>WatchKit不支持运行时去动态的添加和删除界面上的控件、改变他们的顺序，不支持运行时添加或者删除交互事件的响应函数，所有的这些均需要开发时在StoryBoard中做好，甚至于某些控件的属性也是不能在运行时改变的，比如说WKInterfaceLabel的显示多行还是单行等</p>
+</li>
+<li><p>官方给出了可以在运行时改变的内容，不翻译了：<br> Set or update data values.<br> Change the visual appearance of objects that support such modifications.<br> Change the size of an object.<br> Change the transparency of an object.<br> Show or hide an object.</p>
+</li>
+<li><p>可以通过改变透明度和显示隐藏去有限度的去改变布局，比如下图中，第二张截图是将Button1的hidden设置为YES，第三张截图是将Button1的alpha设置为0，可以看到不同的效果<br> <img src="/images/2015-06-28-applewatchde-yi-xie-zong-jie/HiddenAndAlpha.png" alt="WatchApp Layout" title="WatchApp Layout"></p>
+</li>
+</ol>
+<h2 id="InterfaceController"><a href="#InterfaceController" class="headerlink" title="InterfaceController"></a>InterfaceController</h2><p>WKInterfaceController的类似于简化版本的UIViewController，其生命周期也简单的多</p>
+<p><img src="/images/2015-06-28-applewatchde-yi-xie-zong-jie/LifeCycle1.png" alt="Life Cycle1" title="Life Cycle"><br><img src="/images/2015-06-28-applewatchde-yi-xie-zong-jie/LifeCycle2.png" alt="Life Cycle2" title="Life Cycle"></p>
+<ol>
+<li>主要的生命周期中的方法有四个：</li>
+</ol>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)init;</span><br><span class="line">- (<span class="keyword">void</span>)awakeWithContext:(<span class="keyword">id</span>)context;  <span class="comment">//类似于viewDidLoad方法</span></span><br><span class="line">- (<span class="keyword">void</span>)willActivate;    				<span class="comment">//类似于viewWillAppear方法</span></span><br><span class="line">- (<span class="keyword">void</span>)didDeactivate;    			    <span class="comment">//类似于viewDidDisappear方法</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>WatchKit有三种界面的组织方式：分页方式、栈导航方式、model方式；三种方式提供的方法如下：</li>
+</ol>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//栈导航方式</span></span><br><span class="line">- (<span class="keyword">void</span>)pushControllerWithName:(<span class="built_in">NSString</span> *)name context:(<span class="keyword">id</span>)context;</span><br><span class="line">- (<span class="keyword">void</span>)popController;</span><br><span class="line">- (<span class="keyword">void</span>)popToRootController;</span><br><span class="line"></span><br><span class="line"><span class="comment">//分页方式</span></span><br><span class="line">+ (<span class="keyword">void</span>)reloadRootControllersWithNames:(<span class="built_in">NSArray</span> *)names contexts:(<span class="built_in">NSArray</span> *)contexts;</span><br><span class="line">- (<span class="keyword">void</span>)becomeCurrentPage;</span><br><span class="line"></span><br><span class="line"><span class="comment">//model方式</span></span><br><span class="line">- (<span class="keyword">void</span>)presentControllerWithName:(<span class="built_in">NSString</span> *)name context:(<span class="keyword">id</span>)context;</span><br><span class="line">- (<span class="keyword">void</span>)presentControllerWithNames:(<span class="built_in">NSArray</span> *)names contexts:(<span class="built_in">NSArray</span> *)contexts;</span><br><span class="line">- (<span class="keyword">void</span>)dismissController;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>在各个WKInterfaceController之间传递数据是很方便的，在上面说到的切换方法中都会有一个context参数，可以用来传递数据</li>
+</ol>
+<h2 id="WatchKit-控件"><a href="#WatchKit-控件" class="headerlink" title="WatchKit 控件"></a>WatchKit 控件</h2><ol>
+<li><p>WatchKit提供的控件与iOSApp不同，他们全部继承于WKInterfaceObject，WKInterfaceObject则直接继承自NSObject</p>
+<p> NSObject &lt;- WKInterfaceObject &lt;- WKInterfaceLabel</p>
+</li>
+<li><p>WKInterfaceObject只是一个可以直接和界面上控件“交流”的“代理人”的角色，相当于这些控件的Model，但这个“交流”是单向的，开发者可以通过他们去控制控件的一些属性，但不能通过他们去get到控件的当前属性，因此需要开发者自己去保存或记录当前属性，至于原因官方并没有明确地指出</p>
+<blockquote>
+<p>“There are performance and latency implications for retrieving data from Apple Watch, making changes, and writing those changes back to the device.”</p>
+</blockquote>
+</li>
+<li><p>单独看下WKInterfaceMap，其他控件的使用不总结了，有三点需要注意：</p>
+<ul>
+<li>Map只是静态图片，没有任何的交互，点击地图将会启动系统自带的地图应用</li>
+<li>AnnotationView的图片可以自定义，但同时显示的annotationView不能超过5个</li>
+<li>WKInterfaceMap是通过iPhone去获取地图数据的，需要配对的iPhone处于联网状态，才可以显示地图</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AppleWatch/" rel="tag">#AppleWatch</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-05-07-message-forwarding.html" rel="next" title="Message Forwarding">
+                <i class="fa fa-chevron-left"></i> Message Forwarding
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-07-12-zhuan-zai-shen-ru-li-jie-runloop.html" rel="prev" title="[转载]深入理解Runloop">
+                [转载]深入理解Runloop <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="devliubo" />
+          <p class="site-author-name" itemprop="name">devliubo</p>
+          <p class="site-description motion-element" itemprop="description">Keep Learning</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liubo_lb" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Target-Structure"><span class="nav-number">1.</span> <span class="nav-text">Target Structure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据共享和消息通讯"><span class="nav-number">2.</span> <span class="nav-text">数据共享和消息通讯</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WatchKit-App布局"><span class="nav-number">3.</span> <span class="nav-text">WatchKit App布局</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InterfaceController"><span class="nav-number">4.</span> <span class="nav-text">InterfaceController</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WatchKit-控件"><span class="nav-number">5.</span> <span class="nav-text">WatchKit 控件</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">devliubo</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'devliubo';
+      var disqus_identifier = '2015/2015-06-28-applewatchde-yi-xie-zong-jie.html';
+      var disqus_title = 'AppleWatch的一些总结';
+      var disqus_url = 'http://devliubo.com/2015/2015-06-28-applewatchde-yi-xie-zong-jie.html';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
