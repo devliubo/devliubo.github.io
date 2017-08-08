@@ -1,0 +1,831 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,CoreLocation,Background Location,BlueBar," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="最近一直被问到iOS定位权限相关的各种问题，整理下iOS定位权限涉及到的相关字段，其中iOS10与iOS9基本一致。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS定位权限详细说明">
+<meta property="og:url" content="http://devliubo.com/2016/2016-09-27-iOS定位权限详细说明.html">
+<meta property="og:site_name" content="Devliubo">
+<meta property="og:description" content="最近一直被问到iOS定位权限相关的各种问题，整理下iOS定位权限涉及到的相关字段，其中iOS10与iOS9基本一致。">
+<meta property="og:updated_time" content="2017-08-08T14:38:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS定位权限详细说明">
+<meta name="twitter:description" content="最近一直被问到iOS定位权限相关的各种问题，整理下iOS定位权限涉及到的相关字段，其中iOS10与iOS9基本一致。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'devliubo'
+    }
+  };
+</script>
+
+  <title> iOS定位权限详细说明 | Devliubo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-64909752-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Devliubo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                iOS定位权限详细说明
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-27T22:13:24+08:00" content="2016-09-27">
+              2016-09-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/2016-09-27-iOS定位权限详细说明.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/2016-09-27-iOS定位权限详细说明.html" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近一直被问到iOS定位权限相关的各种问题，整理下iOS定位权限涉及到的相关字段，其中iOS10与iOS9基本一致。</p>
+<a id="more"></a>
+<h2 id="iOS定位权限相关字段"><a href="#iOS定位权限相关字段" class="headerlink" title="iOS定位权限相关字段"></a>iOS定位权限相关字段</h2><p>iOS系统下控制定位权限的字段主要有以下几处：</p>
+<ul>
+<li>Capabilities 中选项：<ul>
+<li>BackgroundModes 中的 LocationUpdates ：是否开启后台定位能力，关闭此项后，无论其他几项如何设置，都将没有后台定位权限。</li>
+</ul>
+</li>
+<li>Info.plist 中的字段：<ul>
+<li>NSLocationUsageDescription iOS7和之前的系统在弹框的时候会使用的描述，为可选项。</li>
+<li>NSLocationAlwaysUsageDescription 和 NSLocationWhenInUseUsageDescription iOS8-10的弹框描述字段，申请 requestAlwaysAuthorization 或 requestWhenInUseAuthorization 时必须填写对应的字段。</li>
+</ul>
+</li>
+<li>CoreLocation.framework 中的设置选项：<ul>
+<li>requestAlwaysAuthorization 和 requestWhenInUseAuthorization 与Info.plist中的描述字段对应，申请不同的定位权限。</li>
+<li>pausesLocationUpdatesAutomatically 是否允许系统自动暂停定位功能，设置为YES进行后台定位时，系统检测到长时间没有位置更新的时候，将会暂停定位功能，当app进入前台时会恢复定位功能。(Apple的官方文档描述很模糊，可以参考<a href="http://stackoverflow.com/questions/17484352/iphone-gps-in-background-never-resumes-after-pause" target="_blank" rel="external">Stack Overflow讨论</a>)</li>
+<li>allowsBackgroundLocationUpdates 是否允进行后台定位</li>
+</ul>
+</li>
+</ul>
+<p><strong>Info.plist 中的字段</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">iOS版本</th>
+<th style="text-align:center">NSLocationUsageDescription</th>
+<th style="text-align:center">NSLocationWhenInUseUsageDescription</th>
+<th style="text-align:center">NSLocationAlwaysUsageDescription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">iOS 7</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">×</td>
+</tr>
+<tr>
+<td style="text-align:center">iOS 8</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td style="text-align:center">iOS 9</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td style="text-align:center">iOS 10</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+</tr>
+</tbody>
+</table>
+<p><strong>定位权限相关字段</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">iOS版本</th>
+<th style="text-align:center">Capabilities</th>
+<th style="text-align:center">pauses Location Updates Automatically</th>
+<th style="text-align:center">request Always/WhenInUse Authorization</th>
+<th style="text-align:center">allows Background Location Updates</th>
+<th style="text-align:center">BlueBar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">iOS 7</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">×</td>
+</tr>
+<tr>
+<td style="text-align:center">iOS 8</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">×</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td style="text-align:center">iOS 9</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td style="text-align:center">iOS 10</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">YES</td>
+</tr>
+</tbody>
+</table>
+<h2 id="不同iOS版本差异"><a href="#不同iOS版本差异" class="headerlink" title="不同iOS版本差异"></a>不同iOS版本差异</h2><p>以下表格列举下不同的iOS版本下，不同设置的结果:</p>
+<p><em>(其中pausesLocationUpdatesAutomatically选项在iOS7-10版本下效果一致，不再列举出来。)</em></p>
+<p><strong>iOS 7</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">-</th>
+<th style="text-align:center">Capabilities 关</th>
+<th style="text-align:center">Capabilities 开</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">startUpdatingLocation</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、有后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">用户拒绝</td>
+<td style="text-align:center">无任何定位</td>
+<td style="text-align:center">无任何定位</td>
+</tr>
+</tbody>
+</table>
+<p><strong>iOS 8</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">-</th>
+<th style="text-align:center">Capabilities 关</th>
+<th style="text-align:center">Capabilities 开</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">requestAlwaysAuthorization</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、有后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">requestWhenInUseAuthorization</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、有后台、有蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">无/用户拒绝</td>
+<td style="text-align:center">无任何定位</td>
+<td style="text-align:center">无任何定位</td>
+</tr>
+</tbody>
+</table>
+<p><strong>iOS 9 &amp; iOS 10</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">-</th>
+<th style="text-align:center">-</th>
+<th style="text-align:center">Capabilities 关</th>
+<th style="text-align:center">Capabilities 开</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">requestAlwaysAuthorization</td>
+<td style="text-align:center">allowsBackgroundLocationUpdates关</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">allowsBackgroundLocationUpdates开</td>
+<td style="text-align:center">iOS抛出Crash</td>
+<td style="text-align:center">有前台、有后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">requestWhenInUseAuthorization</td>
+<td style="text-align:center">allowsBackgroundLocationUpdates关</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">allowsBackgroundLocationUpdates开</td>
+<td style="text-align:center">iOS抛出Crash</td>
+<td style="text-align:center">有前台、有后台、有蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">无/用户拒绝</td>
+<td style="text-align:center">allowsBackgroundLocationUpdates关</td>
+<td style="text-align:center">无任何定位</td>
+<td style="text-align:center">无任何定位</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">allowsBackgroundLocationUpdates开</td>
+<td style="text-align:center">iOS抛出Crash</td>
+<td style="text-align:center">无任何定位</td>
+</tr>
+</tbody>
+</table>
+<h2 id="关于继续使用后台定位功能的提示弹框"><a href="#关于继续使用后台定位功能的提示弹框" class="headerlink" title="关于继续使用后台定位功能的提示弹框"></a>关于继续使用后台定位功能的提示弹框</h2><ul>
+<li>如果申请的定位权限为requestAlwaysAuthorization，那应用在切到后台一定时长间隔后，会弹出提示框询问用户“是否继续允许使用后台定位”。</li>
+<li>如果申请的定位权限为requestWhenInUseAuthorization，则不会有提示弹框。</li>
+</ul>
+<h2 id="关于-pausesLocationUpdatesAutomatically-属性"><a href="#关于-pausesLocationUpdatesAutomatically-属性" class="headerlink" title="关于 pausesLocationUpdatesAutomatically 属性"></a>关于 pausesLocationUpdatesAutomatically 属性</h2><p>CLLocationManager.pausesLocationUpdatesAutomatically 设置是否允许自动暂停定位服务，目前Apple的官方文档描述的很模糊，导致<a href="http://stackoverflow.com/questions/17484352/iphone-gps-in-background-never-resumes-after-pause" target="_blank" rel="external">Stackoverflow上有很多的讨论</a>：</p>
+<ul>
+<li>该选项主要用来节省电量消耗，防止app在进入后台后没有及时停止定位消耗电量，设置为YES后，当iOS判定设备不太可能发生移动的时候(这句话是Apple文档直译，然而并不知道具体怎么判定)，会自动暂停掉定位服务以及相关硬件设备</li>
+<li>app在后台定位时，一旦符合了Apple的判定，定位服务以及相关硬件设备被暂停了，除非app回到前台，否则不会恢复定位服务(硬件暂停使得iOS无法判定设备移动)</li>
+</ul>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><p><a href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/CoreLocation/CoreLocation.html" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/CoreLocation/CoreLocation.html</a></p>
+</li>
+<li><p><a href="http://stackoverflow.com/questions/17484352/iphone-gps-in-background-never-resumes-after-pause" target="_blank" rel="external">http://stackoverflow.com/questions/17484352/iphone-gps-in-background-never-resumes-after-pause</a></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/CoreLocation/" rel="tag">#CoreLocation</a>
+          
+            <a href="/tags/Background-Location/" rel="tag">#Background Location</a>
+          
+            <a href="/tags/BlueBar/" rel="tag">#BlueBar</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-09-03-Block-xue-xi-bi-ji.html" rel="next" title="Block学习笔记">
+                <i class="fa fa-chevron-left"></i> Block学习笔记
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/2017-06-29-iOS11定位权限变更-WWDC2017-Session713.html" rel="prev" title="iOS11定位权限变更(WWDC2017-Session713)">
+                iOS11定位权限变更(WWDC2017-Session713) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="devliubo" />
+          <p class="site-author-name" itemprop="name">devliubo</p>
+          <p class="site-description motion-element" itemprop="description">software developer iOS Objective-C MAC</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liubo_lb" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS定位权限相关字段"><span class="nav-number">1.</span> <span class="nav-text">iOS定位权限相关字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不同iOS版本差异"><span class="nav-number">2.</span> <span class="nav-text">不同iOS版本差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于继续使用后台定位功能的提示弹框"><span class="nav-number">3.</span> <span class="nav-text">关于继续使用后台定位功能的提示弹框</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于-pausesLocationUpdatesAutomatically-属性"><span class="nav-number">4.</span> <span class="nav-text">关于 pausesLocationUpdatesAutomatically 属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-number">4.1.</span> <span class="nav-text">参考文档</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">devliubo</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'devliubo';
+      var disqus_identifier = '2016/2016-09-27-iOS定位权限详细说明.html';
+      var disqus_title = 'iOS定位权限详细说明';
+      var disqus_url = 'http://devliubo.com/2016/2016-09-27-iOS定位权限详细说明.html';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

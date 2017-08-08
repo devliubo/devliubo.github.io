@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="runtime," />
+  <meta name="keywords" content="iOS,CoreLoation,WWDC2017," />
 
 
 
@@ -57,16 +57,18 @@
 
 
 
-<meta name="description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
+<meta name="description" content="iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Message Forwarding">
-<meta property="og:url" content="http://devliubo.com/2015/2015-05-07-message-forwarding.html">
+<meta property="og:title" content="iOS11定位权限变更(WWDC2017-Session713)">
+<meta property="og:url" content="http://devliubo.com/2017/2017-06-29-iOS11定位权限变更-WWDC2017-Session713.html">
 <meta property="og:site_name" content="Devliubo">
-<meta property="og:description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
-<meta property="og:updated_time" content="2016-04-02T17:45:10.000Z">
+<meta property="og:description" content="iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。">
+<meta property="og:image" content="http://devliubo.com/images/2017-06-29-iOS11定位权限变更-WWDC2017-Session713/iOS11CoreLocationAuthorization.png">
+<meta property="og:updated_time" content="2017-08-08T14:46:57.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Message Forwarding">
-<meta name="twitter:description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
+<meta name="twitter:title" content="iOS11定位权限变更(WWDC2017-Session713)">
+<meta name="twitter:description" content="iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。">
+<meta name="twitter:image" content="http://devliubo.com/images/2017-06-29-iOS11定位权限变更-WWDC2017-Session713/iOS11CoreLocationAuthorization.png">
 
 
 
@@ -84,7 +86,7 @@
   };
 </script>
 
-  <title> Message Forwarding | Devliubo </title>
+  <title> iOS11定位权限变更(WWDC2017-Session713) | Devliubo </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -215,7 +217,7 @@
             
             
               
-                Message Forwarding
+                iOS11定位权限变更(WWDC2017-Session713)
               
             
           </h1>
@@ -227,8 +229,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-05-07T22:44:00+08:00" content="2015-05-07">
-              2015-05-07
+            <time itemprop="dateCreated" datetime="2017-06-29T20:31:53+08:00" content="2017-06-29">
+              2017-06-29
             </time>
           </span>
 
@@ -257,8 +259,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/2015-05-07-message-forwarding.html#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/2015-05-07-message-forwarding.html" itemprop="commentsCount"></span>
+                <a href="/2017/2017-06-29-iOS11定位权限变更-WWDC2017-Session713.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/2017-06-29-iOS11定位权限变更-WWDC2017-Session713.html" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -280,61 +282,80 @@
       
 
       
-        <p>好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~</p>
+        <p>iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。</p>
 <a id="more"></a>
-<p>iOS中采用给对象发送消息的方式去调用函数，并且消息和方法的实现并不在编译时被绑定到一起，而是在运行时去寻找对应的方法实现</p>
-<p>从objc_msgSend()说起，当给一个对象发送消息时</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[receiver message:arg];</span><br></pre></td></tr></table></figure>
-<p>会被编译器转换成C形式的函数调用</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objc_msgSend(receiver, @selecter(message), arg);</span><br></pre></td></tr></table></figure>
-<p>如官方文档所说:</p>
-<blockquote>
-<p>The messaging function does everything necessary for dynamic binding:</p>
-<p>It first finds the procedure (method implementation) that the selector refers to. Since the same method can be implemented differently by separate classes, the precise procedure that it finds depends on the class of the receiver.</p>
-<p>It then calls the procedure, passing it the receiving object (a pointer to its data), along with any arguments that were specified for the method.</p>
-<p>Finally, it passes on the return value of the procedure as its own return value.</p>
-</blockquote>
-<p>其中第一步的查找过程主要包含以下几个步骤：</p>
-<ol>
-<li><p>检查receiver是否为nil</p>
+<h2 id="iOS11下定位权限变更"><a href="#iOS11下定位权限变更" class="headerlink" title="iOS11下定位权限变更"></a>iOS11下定位权限变更</h2><ol>
+<li><p>依旧支持两种定位权限没有改变：AlwaysAuthorization 和 WhenInUseAuthorization .</p>
 </li>
-<li><p>去receiver对应的class中去查找<strong>@selecter(message)</strong>所对应的<strong>IMP</strong></p>
-<p> a.首先沿着receiver的<strong>isa</strong>指针去到receiver对应的class的cache(isa中的cache)中查找，如果找到，则调用对应的IMP</p>
-<p> b.如果在cache中没有找到，则到class的<strong>dispatch table</strong>中去查找，找到则调用</p>
-<p> c.如果没有找到，则沿着<strong>isa</strong>的<strong>super_class</strong>去到<strong>superclass</strong>中去查找</p>
-<p> d.如此沿着继承链查找下去，直到查找到NSObject中，当找到时则调用</p>
+<li><p>iOS10以及之前版本系统打包发布的请求Always权限的app，在系统升级到iOS11之后，请求框自动增加 WhenInUse 选项供用户选择(如图右侧弹框所示)</p>
 </li>
-<li><p>如果依旧没有找到，则runtime会调用类的方法:</p>
-<p> <strong>+ (BOOL)resolveInstanceMethod:(SEL)sel;</strong></p>
-<p> 或者<strong>+ (BOOL)resolveClassMethod:(SEL)sel;</strong></p>
-<p> 可以在这两个方法中向类中添加selecter所对应的IMP，并返回YES</p>
+<li><p>iOS11之后申请定位权限，必须在Info.plist中必须包含 NSLocationWhenInUseUsageDescription 字段，否则既无法请求 Always 权限，也无法请求 WhenInUse 权限。</p>
 </li>
-<li><p>如果经过上面的三步没有得到对应的IMP，则会触发MessageForwarding机制，runtime会调用类的方法:</p>
-<p> <strong>- (id)forwardingTargetForSelector:(SEL)aSelector;</strong></p>
-<p> 在这个方法中可以将，message转发给另外一个对象(在该方法中返回self会死循环)，去另外的对象中查找对应的IMP</p>
+<li><p>iOS11之后，Info.plist中的 NSLocationAlwaysUsageDescription 字段被废弃，替代的是 NSLocationAlwaysAndWhenInUseUsageDescription 字段，申请 Always 必须填写该字段。同时请求 Always 权限的时候，弹框将不再是之前的样式，而是同时包含 WhenInUse 和 Always 选项的新弹框(如图左侧下部和右侧弹框所示)。</p>
 </li>
-<li><p>经过上面的步骤都没有得到，则runtime会调用方法:</p>
-<p> <strong>- (void)forwardInvocation:(NSInvocation *)anInvocation;</strong></p>
-<p> 做最后的尝试，该方法默认调用方法:</p>
-<p> <strong>- (void)doesNotRecognizeSelector:(SEL)aSelector;</strong></p>
-<p> 抛出一个<strong><em>NSInvalidArgumentException</em></strong>异常(Ps:doseNotRecognizeSelector:方法还可以用于阻止继承某些方法)</p>
-<p> 可以在这个方法中去寻找可以响应消息的对象，之后通过改变<strong>NSInvocation</strong>的<strong>target</strong>去转发消息</p>
-<blockquote>
-<p><strong>需要注意:</strong>在该方法调用前，为了生成message对应的NSInvocation，需要重载方法:</p>
-<p><strong>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;</strong></p>
-<p>去生成selector对应的方法签名</p>
-<p>因为包含了生成方法签名和NSInvocation的过程，所以被形容为比forwardingTargetForSelecter:代价更大</p>
-</blockquote>
+<li><p>定位权限的请求流程如下图所示：</p>
+<ul>
+<li>如果第一次请求的是 WhenInUse 权限，之后可以再次请求 Always 权限(如图左侧流程)。</li>
+<li><p>如果第一次直接请求 Always 权限，即使用户选择的是 WhenInUse 权限，之后也不可以再次请求 Always 权限(如图右侧流程)</p>
+<p><img src="/images/2017-06-29-iOS11定位权限变更-WWDC2017-Session713/iOS11CoreLocationAuthorization.png" alt="authorization" title="authorization"></p>
 </li>
-<li><p>如果使用Message Forwarding，除了上面的几个方法外，还需要注意在必要时重载一些相关的方法等等:</p>
-<p> <strong>+ (IMP)instanceMethodForSelector:(SEL)aSelector;</strong></p>
-<p> <strong>- (BOOL)respondsToSelector:(SEL)aSelector;</strong></p>
-<p> <strong>+ (BOOL)instancesRespondToSelector:(SEL)aSelector;</strong></p>
-<p> <strong>- (BOOL)conformsToProtocol:(Protocol *)aProtocol;</strong></p>
-<p> <strong>- (BOOL)isKindOfClass:(Class)aClass;</strong></p>
+</ul>
+</li>
+<li><p><strong>iOS11之后，在后台定位的时候，都会有蓝条的出现，无法消除蓝条的存在。</strong></p>
 </li>
 </ol>
-<p><a href="https://git.oschina.net/bomylib/MessageForwarding.git" target="_blank" rel="external">OSChina:MessageForwarding</a></p>
+<h2 id="iOS11详细权限列表"><a href="#iOS11详细权限列表" class="headerlink" title="iOS11详细权限列表"></a>iOS11详细权限列表</h2><p><strong>iOS 11</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">-</th>
+<th style="text-align:center">-</th>
+<th style="text-align:center">Capabilities 关</th>
+<th style="text-align:center">Capabilities 开</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">requestAlwaysAuthorization</td>
+<td style="text-align:center">allowsBackgroundLocationUpdates关</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">allowsBackgroundLocationUpdates开</td>
+<td style="text-align:center">iOS抛出Crash</td>
+<td style="text-align:center">有前台、有后台、有蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">requestWhenInUseAuthorization</td>
+<td style="text-align:center">allowsBackgroundLocationUpdates关</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+<td style="text-align:center">有前台、无后台、无蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">allowsBackgroundLocationUpdates开</td>
+<td style="text-align:center">iOS抛出Crash</td>
+<td style="text-align:center">有前台、有后台、有蓝条</td>
+</tr>
+<tr>
+<td style="text-align:center">无/用户拒绝</td>
+<td style="text-align:center">allowsBackgroundLocationUpdates关</td>
+<td style="text-align:center">无任何定位</td>
+<td style="text-align:center">无任何定位</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">allowsBackgroundLocationUpdates开</td>
+<td style="text-align:center">iOS抛出Crash</td>
+<td style="text-align:center">无任何定位</td>
+</tr>
+</tbody>
+</table>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li>WWDC 2017 <a href="https://developer.apple.com/videos/play/wwdc2017/713/" target="_blank" rel="external">Session 713</a></li>
+</ul>
 
       
     </div>
@@ -349,7 +370,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/runtime/" rel="tag">#runtime</a>
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/CoreLoation/" rel="tag">#CoreLoation</a>
+          
+            <a href="/tags/WWDC2017/" rel="tag">#WWDC2017</a>
           
         </div>
       
@@ -358,17 +383,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html" rel="next" title="配置git多SSH-Key共存">
-                <i class="fa fa-chevron-left"></i> 配置git多SSH-Key共存
+              <a href="/2016/2016-09-27-iOS定位权限详细说明.html" rel="next" title="iOS定位权限详细说明">
+                <i class="fa fa-chevron-left"></i> iOS定位权限详细说明
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/2015-06-28-applewatchde-yi-xie-zong-jie.html" rel="prev" title="AppleWatch的一些总结">
-                AppleWatch的一些总结 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -520,7 +541,7 @@
               
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11下定位权限变更"><span class="nav-number">1.</span> <span class="nav-text">iOS11下定位权限变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11详细权限列表"><span class="nav-number">2.</span> <span class="nav-text">iOS11详细权限列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-number">2.1.</span> <span class="nav-text">参考文档</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -628,9 +649,9 @@
 
     <script type="text/javascript">
       var disqus_shortname = 'devliubo';
-      var disqus_identifier = '2015/2015-05-07-message-forwarding.html';
-      var disqus_title = 'Message Forwarding';
-      var disqus_url = 'http://devliubo.com/2015/2015-05-07-message-forwarding.html';
+      var disqus_identifier = '2017/2017-06-29-iOS11定位权限变更-WWDC2017-Session713.html';
+      var disqus_title = 'iOS11定位权限变更(WWDC2017-Session713)';
+      var disqus_url = 'http://devliubo.com/2017/2017-06-29-iOS11定位权限变更-WWDC2017-Session713.html';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');
