@@ -76,6 +76,10 @@ deploy:
 # Disqus Comments
 disqus_shortname: devliubo
 
+# Google Webmaster tools verification setting
+# See: https://www.google.com/webmasters/
+google_site_verification: ZBZEDBPbpwqgvI2ksVf0xL1Mde_7fZ7mVfJWN0uraUE
+
 # Google Analytics
 google_analytics: UA-64909752-1
 
