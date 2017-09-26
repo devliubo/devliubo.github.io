@@ -66,7 +66,7 @@
 <meta property="og:site_name" content="Devliubo">
 <meta property="og:description" content="iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。">
 <meta property="og:image" content="http://devliubo.com/images/2017-06-29-iOS11定位权限变更-WWDC2017-Session713/iOS11CoreLocationAuthorization.png">
-<meta property="og:updated_time" content="2017-08-08T14:55:10.000Z">
+<meta property="og:updated_time" content="2017-09-26T15:00:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS11定位权限变更(WWDC2017-Session713)">
 <meta name="twitter:description" content="iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。">
@@ -286,6 +286,20 @@
       
         <p>iOS11中针对定位权限又有新的细化控制，看了下WWDC2017的Session713中关于定位权限的部分，balabala说了一大堆，总结出来也就几条。。。</p>
 <a id="more"></a>
+<h2 id="iOS11-GM版本又有变更"><a href="#iOS11-GM版本又有变更" class="headerlink" title="iOS11 GM版本又有变更"></a>iOS11 GM版本又有变更</h2><p>测试GM版本的时候，发现后台定位的时候蓝条竟然没有出现！什么鬼。。。Google了一下发现iOS11在蓝条的出现上确实有修改：</p>
+<p>从iOS11-beta-5开始，iOS11中CLLocationManager类增加了一个字段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@property(assign, nonatomic) BOOL showsBackgroundLocationIndicator  API_AVAILABLE(ios(11.0));</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>这个属性仅针对申请Always权限的情况，申请WhenInUse权限的不受该属性的影响</p>
+</li>
+<li><p>这个属性表示，当请求了Always权限，并且在后台定位的时候蓝条是否会出现，默认值为NO，也就是说默认情况下，蓝条的出现时机与iOS10的保持了一致</p>
+</li>
+<li><p>当设置为YES后，请求了Always权限并且在后台定位的时候会出现蓝条</p>
+</li>
+</ol>
+<p>参考链接：<a href="https://forums.developer.apple.com/thread/84125" target="_blank" rel="external">https://forums.developer.apple.com/thread/84125</a></p>
+<p><em>(Ps: 设置成YES，让自己的app在后台悄悄定位的时候还出个蓝条？估计没谁这么干。。。Apple这是妥协了么。。。)</em></p>
+<p>————以上为9月18日更新————</p>
 <h2 id="iOS11下定位权限变更"><a href="#iOS11下定位权限变更" class="headerlink" title="iOS11下定位权限变更"></a>iOS11下定位权限变更</h2><ol>
 <li><p>依旧支持两种定位权限没有改变：AlwaysAuthorization 和 WhenInUseAuthorization .</p>
 </li>
@@ -547,7 +561,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11下定位权限变更"><span class="nav-number">1.</span> <span class="nav-text">iOS11下定位权限变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11详细权限列表"><span class="nav-number">2.</span> <span class="nav-text">iOS11详细权限列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-number">2.1.</span> <span class="nav-text">参考文档</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11-GM版本又有变更"><span class="nav-number">1.</span> <span class="nav-text">iOS11 GM版本又有变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11下定位权限变更"><span class="nav-number">2.</span> <span class="nav-text">iOS11下定位权限变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS11详细权限列表"><span class="nav-number">3.</span> <span class="nav-text">iOS11详细权限列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-number">3.1.</span> <span class="nav-text">参考文档</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
