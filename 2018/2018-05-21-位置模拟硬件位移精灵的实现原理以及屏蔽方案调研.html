@@ -1,0 +1,655 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="ZBZEDBPbpwqgvI2ksVf0xL1Mde_7fZ7mVfJWN0uraUE" />
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,CoreLocation,FakeGPS,ExternalAccessory," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="最近收到了第三方的反馈，说除了之前可以检测到的软件层面的虚拟定位意外，如今更是发现了一个硬件设备，299软妹币一个，专门用来对非越狱的iOS系统进行模拟位置。。。连硬件设备都派上来了，无所不用其极啊！恰恰也说明网约车司机们，对这方面的需求还是很大的，闷声发大财的人真的很多（手动思考状）。">
+<meta name="keywords" content="iOS,CoreLocation,FakeGPS,ExternalAccessory">
+<meta property="og:type" content="article">
+<meta property="og:title" content="位置模拟硬件位移精灵的实现原理以及屏蔽方案调研">
+<meta property="og:url" content="http://devliubo.com/2018/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研.html">
+<meta property="og:site_name" content="Devliubo">
+<meta property="og:description" content="最近收到了第三方的反馈，说除了之前可以检测到的软件层面的虚拟定位意外，如今更是发现了一个硬件设备，299软妹币一个，专门用来对非越狱的iOS系统进行模拟位置。。。连硬件设备都派上来了，无所不用其极啊！恰恰也说明网约车司机们，对这方面的需求还是很大的，闷声发大财的人真的很多（手动思考状）。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://devliubo.com/images/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研/ExternalAccessory0.png">
+<meta property="og:image" content="http://devliubo.com/images/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研/ExternalAccessory1.png">
+<meta property="og:updated_time" content="2018-08-18T06:21:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="位置模拟硬件位移精灵的实现原理以及屏蔽方案调研">
+<meta name="twitter:description" content="最近收到了第三方的反馈，说除了之前可以检测到的软件层面的虚拟定位意外，如今更是发现了一个硬件设备，299软妹币一个，专门用来对非越狱的iOS系统进行模拟位置。。。连硬件设备都派上来了，无所不用其极啊！恰恰也说明网约车司机们，对这方面的需求还是很大的，闷声发大财的人真的很多（手动思考状）。">
+<meta name="twitter:image" content="http://devliubo.com/images/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研/ExternalAccessory0.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'devliubo'
+    }
+  };
+</script>
+
+  <title> 位置模拟硬件位移精灵的实现原理以及屏蔽方案调研 | Devliubo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-64909752-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Devliubo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                位置模拟硬件位移精灵的实现原理以及屏蔽方案调研
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-05-21T14:00:22+08:00" content="2018-05-21">
+              2018-05-21
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研.html" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近收到了第三方的反馈，说除了之前可以检测到的软件层面的虚拟定位意外，如今更是发现了一个硬件设备，299软妹币一个，专门用来对非越狱的iOS系统进行模拟位置。。。连硬件设备都派上来了，无所不用其极啊！恰恰也说明网约车司机们，对这方面的需求还是很大的，闷声发大财的人真的很多（手动思考状）。</p>
+<a id="more"></a>
+<h4 id="更新一下（2018-7-24）"><a href="#更新一下（2018-7-24）" class="headerlink" title="更新一下（2018.7.24）"></a>更新一下（2018.7.24）</h4><ol>
+<li>研究了下两台设备间的相同点与不同点：<ul>
+<li>相同点：<ul>
+<li>厂家信息中name、manufacturer、modelNumber、firmwareRevision、hardwareRevision与protocols字段内容相同；</li>
+<li>蓝牙广播中kCBAdvDataServiceUUIDs的值相同，都为EEEE8317-01EE-0220-0020-00000021EAFE；</li>
+</ul>
+</li>
+<li>不同点：<ul>
+<li>厂家信息中serialNumber字段不同；</li>
+<li>蓝牙广播中kCBAdvDataLocalName、identifier值不同；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>目前发现一个问题，在iOS9上可以获取所有外接设备，不需要额外操作；但是在iOS10、11上，需要在APP的Info.plist中增加相应的字段：Supported external accessory protocols，并且需要在其中指定需要检测的外接设备的protocol，才可以获取到外接设备列表：</li>
+</ol>
+<p><img src="/images/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研/ExternalAccessory0.png" alt="ExternalAccessory0"></p>
+<p>这样就会出现一个情况，在iOS10或者11上，要检测特定类型的设备，必须APP先在Info.plist中写上这个类型的protocol，这样就不能实现检测任意设备的效果。并且这个是iOS的硬性要求，无法跳过。</p>
+<p>————以上为7月24日更新————</p>
+<h2 id="硬件实现原理调研"><a href="#硬件实现原理调研" class="headerlink" title="硬件实现原理调研"></a>硬件实现原理调研</h2><ol>
+<li><p>“位移精灵”硬件在蓝牙列表中显示为2个设备，分别为：WY-xxxx-BLE 和 WY-xxxx-MFI (xxxx代表四位数字)<br> 1.1 WY-xxxx-MFI 设备为经过MFI验证的辅助GPS设备(作为GPS信息输入源)，但其内部并没有真正的GPS芯片，而是模拟的假GPS数据<br> 1.2 WY-xxxx-BLE 设备为与对应App之间通讯传输使用，可以在App端指定要模拟的位置</p>
+</li>
+<li><p>模拟效果：<br> 2.1 iOS系统定位服务直接返回模拟的结果，调用堆栈与定位服务的正常返回一样(之前出现的虚拟定位插件在这里有差别)<br> 2.2 在室内可以稳定模拟位置；在室外结果不稳定，定位结果会在模拟位置与正常位置之间来回跳动，有70%数据为正常结果<br> 2.3 模拟的定位结果返回数据无特别明显的差别，目前看到的唯一差别为altitude值在90%情况下为0</p>
+</li>
+<li><p>尝试连接获取设备信息：<br> 通过代码访问iOS设备的ExternalAccessory列表，也可以看到该设备，设备的生产厂家信息如下(这些信息是硬件生产厂家指定的)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">name: C01-BR30 //设备名称</span><br><span class="line">manufacturer: Zhejiang Shenghui Lighting Co., Ltd //生产厂家</span><br><span class="line">modelNumber: BR30 //设备模块编号</span><br><span class="line">serialNumber: 000218000000 //序列号</span><br><span class="line">firmwareRevision: 1.0.1 //固件版本</span><br><span class="line">hardwareRevision: 1.0.1 //硬件版本</span><br><span class="line">protocols: &quot;com.sengled.protocol.btspeaker&quot; //通讯协议</span><br><span class="line">另外，通过iOS的私有API可以拿到：</span><br><span class="line">macAddress: 00:06:00:00:02:18 //mac地址</span><br><span class="line">preferredApp: T83739RUE3 //对应一个Apple开发者账户</span><br><span class="line">supportsLocation: true //是否支持定位</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>尝试与设备通讯：<br> 4.1 与名为WY-xxxx-MFI的设备尝试连接，由于使用的是私有的通讯协议，不知道具体协议内容，所以无法与设备进行通讯，设备默认状态下不对外发送任何数据，向设备发送一些随机的测试内容均没有相应，没能够获取设备通讯数据。<br> 4.2 与名为WY-xxxx-BLE的设备尝试连接，但连接后瞬间被设备主动断开连接，推测是连接请求中的没有附带符合要求的参数导致，无法进一步与设备通讯。</p>
+</li>
+<li><p>识别检测：<br>因为MFI开发属于硬件范畴(并且文档Apple要求严格保密)，而我们SDK的属于软件层面，因此需要从软件层面出发进行检测，可以通过获取iOS设备的ExternalAccessory列表，从中判断是否有特定类型的设备去识别，但此方案有以下两个风险：<br> 5.1 硬件设备厂家信息更新会使得特征失效。<br> 5.2 如果是盗用手段借助了通过认证的MFI芯片，则厂家正常生产的智能家居类设备可能被误判。</p>
+</li>
+<li>另外，可以查到生产厂家是生产LED灯的厂家，从Apple官方可以查询到，该企业通过了MFI认证，可以断定设备是借助了这个厂家的MFI芯片，不确定是不是非法破解挪用。</li>
+</ol>
+<p><img src="/images/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研/ExternalAccessory1.png" alt="ExternalAccessory1"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/CoreLocation/" rel="tag">#CoreLocation</a>
+          
+            <a href="/tags/FakeGPS/" rel="tag">#FakeGPS</a>
+          
+            <a href="/tags/ExternalAccessory/" rel="tag">#ExternalAccessory</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/2018-03-20-Flutter-beta版的widgets不能与mapview混用.html" rel="next" title="Flutter-beta版的widgets不能与mapview混用">
+                <i class="fa fa-chevron-left"></i> Flutter-beta版的widgets不能与mapview混用
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/2018-06-28-Xcode10中用到libstdc++6-0-9-tbd导致的问题.html" rel="prev" title="Xcode10中用到libstdc++6.0.9.tbd导致的问题">
+                Xcode10中用到libstdc++6.0.9.tbd导致的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="devliubo" />
+          <p class="site-author-name" itemprop="name">devliubo</p>
+          <p class="site-description motion-element" itemprop="description">software developer iOS Objective-C MAC</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liubo_lb" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#更新一下（2018-7-24）"><span class="nav-number">1.</span> <span class="nav-text">更新一下（2018.7.24）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#硬件实现原理调研"><span class="nav-number"></span> <span class="nav-text">硬件实现原理调研</span></a></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">devliubo</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'devliubo';
+      var disqus_identifier = '2018/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研.html';
+      var disqus_title = '位置模拟硬件位移精灵的实现原理以及屏蔽方案调研';
+      var disqus_url = 'http://devliubo.com/2018/2018-05-21-位置模拟硬件位移精灵的实现原理以及屏蔽方案调研.html';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

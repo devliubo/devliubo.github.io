@@ -1,0 +1,642 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="ZBZEDBPbpwqgvI2ksVf0xL1Mde_7fZ7mVfJWN0uraUE" />
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,Static Library,Dynamic Library,Crash," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="最近收集到一个crash，在APP中同时使用我们地图SDK与一个跨平台的基于Unity的库，会在mapView释放的时候导致crash，发生的场景非常的奇怪并且稳定必现，进过排查发现最终的问题在于两个库的link过程中的隐藏问题，最终导致了APP在运行时发生Crash。">
+<meta name="keywords" content="iOS,Static Library,Dynamic Library,Crash">
+<meta property="og:type" content="article">
+<meta property="og:title" content="依赖库link时的隐藏问题导致APP在运行时crash排查记录">
+<meta property="og:url" content="http://devliubo.com/2018/2018-07-15-依赖库link时的隐藏问题导致APP在运行时crash排查记录.html">
+<meta property="og:site_name" content="Devliubo">
+<meta property="og:description" content="最近收集到一个crash，在APP中同时使用我们地图SDK与一个跨平台的基于Unity的库，会在mapView释放的时候导致crash，发生的场景非常的奇怪并且稳定必现，进过排查发现最终的问题在于两个库的link过程中的隐藏问题，最终导致了APP在运行时发生Crash。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-18T08:00:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="依赖库link时的隐藏问题导致APP在运行时crash排查记录">
+<meta name="twitter:description" content="最近收集到一个crash，在APP中同时使用我们地图SDK与一个跨平台的基于Unity的库，会在mapView释放的时候导致crash，发生的场景非常的奇怪并且稳定必现，进过排查发现最终的问题在于两个库的link过程中的隐藏问题，最终导致了APP在运行时发生Crash。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'devliubo'
+    }
+  };
+</script>
+
+  <title> 依赖库link时的隐藏问题导致APP在运行时crash排查记录 | Devliubo </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-64909752-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Devliubo</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                依赖库link时的隐藏问题导致APP在运行时crash排查记录
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-15T14:26:09+08:00" content="2018-07-15">
+              2018-07-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/2018-07-15-依赖库link时的隐藏问题导致APP在运行时crash排查记录.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/2018-07-15-依赖库link时的隐藏问题导致APP在运行时crash排查记录.html" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近收集到一个crash，在APP中同时使用我们地图SDK与一个跨平台的基于Unity的库，会在mapView释放的时候导致crash，发生的场景非常的奇怪并且稳定必现，进过排查发现最终的问题在于两个库的link过程中的隐藏问题，最终导致了APP在运行时发生Crash。</p>
+<a id="more"></a>
+<h3 id="查看Crash的堆栈信息"><a href="#查看Crash的堆栈信息" class="headerlink" title="查看Crash的堆栈信息"></a>查看Crash的堆栈信息</h3><p>问题发生的场景非常的奇怪，但用户也很给力，给我们提供了相关的库让我们排查问题，非常赞。通过与用户进行交流，得到的信息是他们的工程中使用到了一个基于Unity和ARKit.framework的静态库，和我们地图SDK的静态库一起使用的时候就会出现问题，crash的堆栈信息如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">* thread <span class="meta">#1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x18)</span></span><br><span class="line">   frame <span class="meta">#0: 0x0000000101042924 testGd`remove_free_block + 4</span></span><br><span class="line">   frame <span class="meta">#1: 0x00000001010426e8 testGd`block_merge_next + 56</span></span><br><span class="line">   frame <span class="meta">#2: 0x0000000101042688 testGd`tlsf_free + 144</span></span><br><span class="line">   frame <span class="meta">#3: 0x0000000101058ba8 testGd`DynamicHeapAllocator<span class="meta-string">&lt;LowLevelAllocator&gt;</span>::TryDeallocate(void*) + 208</span></span><br><span class="line">   frame <span class="meta">#4: 0x000000010105af3c testGd`operator delete(void*) + 32</span></span><br><span class="line">   frame <span class="meta">#5: 0x00000001003cf714 testGd`PointLabelItem::~PointLabelItem() + 48</span></span><br><span class="line">   frame <span class="meta">#6: 0x00000001003d3f08 testGd`IconCenterLabelItem::~IconCenterLabelItem() + 88</span></span><br><span class="line">   frame <span class="meta">#7: 0x000000010031ed28 testGd`Amapbase_ArraylistFree + 68</span></span><br><span class="line">   frame <span class="meta">#8: 0x000000010038741c testGd`CAnBmdGridResource::~CAnBmdGridResource() + 356</span></span><br><span class="line">   frame <span class="meta">#9: 0x0000000100387564 testGd`CAnBmdGridResource::~CAnBmdGridResource() + 12</span></span><br><span class="line">   frame <span class="meta">#10: 0x000000010034d260 testGd`CAnEntityObject::SetResource(CAnResource*) + 32</span></span><br><span class="line">   frame <span class="meta">#11: 0x0000000100386abc testGd`CAnBmdGrid::~CAnBmdGrid() + 40</span></span><br><span class="line">   frame <span class="meta">#12: 0x000000010034cd40 testGd`CAnDestroyEntityProxy::Clear() + 112</span></span><br><span class="line">   frame <span class="meta">#13: 0x000000010034cc48 testGd`CAnDestroyEntityProxy::~CAnDestroyEntityProxy() + 36</span></span><br><span class="line">   frame <span class="meta">#14: 0x000000010034cd70 testGd`CAnDestroyEntityProxy::~CAnDestroyEntityProxy() + 12</span></span><br><span class="line">   frame <span class="meta">#15: 0x000000010034d55c testGd`CAnFramework::Destroy() + 260</span></span><br><span class="line">   frame <span class="meta">#16: 0x0000000100333cb0 testGd`dice::CMapViewWithStyleManager::destroyAllMapsEGLRes() + 68</span></span><br><span class="line">   frame <span class="meta">#17: 0x000000010032ee0c testGd`dice::CDeviceMessageProxy::processMessage(asl::Message const&amp;) + 260</span></span><br><span class="line">   frame <span class="meta">#18: 0x0000000100332f9c testGd`dice::CRenderDevicesManager::onProcessMessage(asl::Message const&amp;) + 40</span></span><br><span class="line">   frame <span class="meta">#19: 0x000000010066551c testGd`asl::BaseMessageLooper::onProcMessage(asl::Message*) + 168</span></span><br><span class="line">   frame <span class="meta">#20: 0x000000010032f338 testGd`dice::CDevicesOperatorImpl::destroyDevice(dice::EGLDeviceID) + 236</span></span><br><span class="line">   frame <span class="meta">#21: 0x00000001001da1d0 testGd`AMapEngine::~AMapEngine() + 52</span></span><br><span class="line"> * frame <span class="meta">#22: 0x00000001001a3478 testGd`::-[MAMapEngine destroyMapEngine](self=0x0000000134fa6c90, _cmd=<span class="meta-string">"destroyMapEngine"</span>) at MAMapEngine.mm:1206</span></span><br><span class="line">   frame <span class="meta">#23: 0x00000001001a3668 testGd`::-[MAMapEngine dealloc](self=0x0000000134fa6c90, _cmd=<span class="meta-string">"dealloc"</span>) at MAMapEngine.mm:1221</span></span><br><span class="line">   frame <span class="meta">#24: 0x0000000100116d04 testGd`-[MAMapRender dealloc](self=0x0000000134f49260, _cmd=<span class="meta-string">"dealloc"</span>) at MAMapRender.m:306</span></span><br><span class="line">   frame <span class="meta">#25: 0x00000001809e1ae8 libobjc.A.dylib`(anonymous namespace)::AutoreleasePoolPage::pop(void*) + 508</span></span><br><span class="line">   frame <span class="meta">#26: 0x00000001000d9058 testGd`-[MAMapView MAMapViewDeallocOperation](self=0x0000000135806200, _cmd=<span class="meta-string">"MAMapViewDeallocOperation"</span>) at MAMapView.m:5381</span></span><br><span class="line">   frame <span class="meta">#27: 0x00000001000d8aa8 testGd`-[MAMapView dealloc](self=0x0000000135806200, _cmd=<span class="meta-string">"dealloc"</span>) at MAMapView.m:5331</span></span><br><span class="line">   frame <span class="meta">#28: 0x00000001809e1ae8 libobjc.A.dylib`(anonymous namespace)::AutoreleasePoolPage::pop(void*) + 508</span></span><br><span class="line">   frame <span class="meta">#29: 0x00000001812409fc CoreFoundation`_CFAutoreleasePoolPop + 28</span></span><br><span class="line">   frame <span class="meta">#30: 0x0000000181316bc0 CoreFoundation`__CFRunLoopRun + 1636</span></span><br><span class="line">   frame <span class="meta">#31: 0x0000000181240c50 CoreFoundation`CFRunLoopRunSpecific + 384</span></span><br><span class="line">   frame <span class="meta">#32: 0x0000000182b28088 GraphicsServices`GSEventRunModal + 180</span></span><br><span class="line">   frame <span class="meta">#33: 0x000000018652e088 UIKit`UIApplicationMain + 204</span></span><br><span class="line">   frame <span class="meta">#34: 0x0000000100011998 testGd`main(argc=1, argv=0x000000016fdf39e8) at main.m:19</span></span><br><span class="line">   frame <span class="meta">#35: 0x0000000180dde8b8 libdyld.dylib`start + 4</span></span><br></pre></td></tr></table></figure>
+<h3 id="最初的排查方向"><a href="#最初的排查方向" class="headerlink" title="最初的排查方向"></a>最初的排查方向</h3><p>其实一开始排查的时候我走错了方向，看到了delete和EXC_BAD_ACCESS相关的栈信息，结合其他堆栈信息，我直接想到了应该重复delete资源导致（用户删除了我们的资源，后续在Autorelease的pop过程中重复释放），然后跟用户确认了下，他们的基于Unity的库也有用到OpenGLES，所以第一反应是直接让用户去检查他们的OpenGLES代码。。。因为在此之前也接到过很多类似的反馈，是由于用户在使用OpenGLES的过程中，删除纹理或其他gl资源的时候，并没有验证当前所在的context，导致错误的在我们地图的context上删除了我们SDK的纹理或资源，使得地图绘制发生问题或者直接Crash。另外，我们SDK也曾经因为遗漏对context验证，导致地图和cocos2d同时使用使cocos2d出现黑屏现象。</p>
+<h3 id="通过异常的堆栈信息追踪问题真实原因"><a href="#通过异常的堆栈信息追踪问题真实原因" class="headerlink" title="通过异常的堆栈信息追踪问题真实原因"></a>通过异常的堆栈信息追踪问题真实原因</h3><p>关键信息来了，跟用户交流的时候提到他们的静态库实现的时候，用户就和我提到了他们的基于Unity的静态库也引入了自己的C++实现，并没有依赖于端平台提供的C++实现，可惜的是最初忽略了这个点，也是导致走错路的根本原因。</p>
+<p>根用户交流之后，当回过头来再看这个问题的时候，突然发现了Crash堆栈中的一个很奇怪的现象，问题出现在下面两个堆栈信息：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">frame <span class="meta">#4: 0x000000010105af3c testGd`operator delete(void*) + 32</span></span><br><span class="line">frame <span class="meta">#5: 0x00000001003cf714 testGd`PointLabelItem::~PointLabelItem() + 48</span></span><br></pre></td></tr></table></figure>
+<p>按常理来说，PointLabelItem是我们SDK的类，PointLabelItem的析构方法中，调用delete删除了一些东西，delete方法实现是不应该出现在testGd这个app中的，delete的实现应该是C++库提供实现的，而这里却奇怪的调用到了testGd这个APP中的一个delete实现，这个实现从何而来？</p>
+<p>突然意识到交流中提到的这个基于Unity实现的这个库的问题，那就要去查看下用户的库的符号表了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nm xxxx.a | grep DynamicHeapAllocator  //delete太多了不好找。。。找DynamicHeapAllocator更容易些.</span><br></pre></td></tr></table></figure>
+<p>果然，在用户的这个库中是存在的，也就是最初忽略的问题，这算是找到正确的方向了。进而去验证一下，验证的方法就是调整我们SDK和用户的静态库，在Link binary with library中的顺序，让我们SDK先于用户的库被link，进过验证问题果然得到了解决。</p>
+<h3 id="问题发生的原因总结"><a href="#问题发生的原因总结" class="headerlink" title="问题发生的原因总结"></a>问题发生的原因总结</h3><p>因为用户的静态库中引入了一套自己的C++实现，并没有依赖端平台提供的实现，而我们SDK则是依赖于iOS平台提供的C++实现，这就导致了在整个APP的Link过程中会先后涉及到两份C++实现。</p>
+<p>这里首先要提到Xcode和LLVM的一个特点：</p>
+<ul>
+<li>首先说对于OC的类，如果两个静态库有同名的OC类，同时引用两个库的话，编译会报符号表冲突错误(Duplicated Symbols)；如果是两个动态库有同名的OC类，则编译可以通过，运行时会给出重复定义的警告log。类似于下面这种，提示调用哪一个是未定义的，但实际上会根据两个framework在Link binary with library中的顺序决定。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class XXXX is implemented in both xxxx/MyFramework.app/Frameworks/A.framework/A and xxxx/MyFramework.app/Frameworks/B.framework/B. One of the two will be used. Which one is undefined.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>但对于C/C++来说，如果两个静态库有同名的C/C++类或方法，Local的符号(比如static变量)没有问题，但Global的符号(比如extern声明的变量)会在编译的时候会报符号表冲突错误(Duplicated Symbols)，导致编译失败；如果是两个动态库有同名的C/C++类或方法，Local的符号同样没问题，但Global的符号在真正调用的时候也是未定义的，会根据两个动态库在Link binary with library中的顺序决定，最最重要的一点是，这种情况下，Xcode并不会给出重复定义的警告log。这也是导致这个Crash没有及时被发现的原因之一。</li>
+</ul>
+<p>另一个重要原因是，如果一个符号在静态库和动态库都存在的话，会优先link到静态库的实现上。</p>
+<p>综上所述，发生这次Crash的过程可以简单描述下，在将所有的静态库Link到APP的可执行mach-o文件的时候，会跟据xcode的Build Phase下link binary with library中的顺序进行。</p>
+<ul>
+<li><p>如果我们SDK先被link，则此时的delete符号不会link，而会在运行时从libc++.tbd动态库中查找到符号的实现。</p>
+</li>
+<li><p>如果先link了用户的静态库，则再link我们SDK的时候，在APP本身就能找到delete的实现，直接link到这个实现了，也就不会在运行时去libc++.tbd动态库中查找了，从而导致调用了错误的delete，出现了crash问题。</p>
+</li>
+</ul>
+<p>关于编译连接的过程研究的还不够深入，如有错误，欢迎指出~</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/Static-Library/" rel="tag">#Static Library</a>
+          
+            <a href="/tags/Dynamic-Library/" rel="tag">#Dynamic Library</a>
+          
+            <a href="/tags/Crash/" rel="tag">#Crash</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/2018-07-13-动态库或静态库中的符号类型说明.html" rel="next" title="动态库或静态库中的符号类型说明">
+                <i class="fa fa-chevron-left"></i> 动态库或静态库中的符号类型说明
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="devliubo" />
+          <p class="site-author-name" itemprop="name">devliubo</p>
+          <p class="site-description motion-element" itemprop="description">software developer iOS Objective-C MAC</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liubo_lb" target="_blank">
+                  
+                    <i class="fa fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/devliubo" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        <div class="links-of-blogroll motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看Crash的堆栈信息"><span class="nav-number">1.</span> <span class="nav-text">查看Crash的堆栈信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最初的排查方向"><span class="nav-number">2.</span> <span class="nav-text">最初的排查方向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过异常的堆栈信息追踪问题真实原因"><span class="nav-number">3.</span> <span class="nav-text">通过异常的堆栈信息追踪问题真实原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题发生的原因总结"><span class="nav-number">4.</span> <span class="nav-text">问题发生的原因总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">devliubo</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+
+  
+
+
+
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=0.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'devliubo';
+      var disqus_identifier = '2018/2018-07-15-依赖库link时的隐藏问题导致APP在运行时crash排查记录.html';
+      var disqus_title = '依赖库link时的隐藏问题导致APP在运行时crash排查记录';
+      var disqus_url = 'http://devliubo.com/2018/2018-07-15-依赖库link时的隐藏问题导致APP在运行时crash排查记录.html';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
