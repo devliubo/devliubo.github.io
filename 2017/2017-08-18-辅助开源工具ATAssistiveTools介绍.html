@@ -43,7 +43,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="git," />
+  <meta name="keywords" content="iOS,UIKit,Sandbox,FackGPS," />
 
 
 
@@ -59,18 +59,18 @@
 
 
 
-<meta name="description" content="练习下写总结，整理下以前在配置git过程中的SSH-Key共存和移除submodule的方法~">
-<meta name="keywords" content="git">
+<meta name="description" content="ATAssistiveTools 是一个辅助调试工具容器，提供了FakeLocation、SandboxViewer、DeviceLogs、GPSEmulator四个功能做示例。">
+<meta name="keywords" content="iOS,UIKit,Sandbox,FackGPS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="配置git多SSH-Key共存">
-<meta property="og:url" content="http://devliubo.com/2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html">
+<meta property="og:title" content="辅助开源工具ATAssistiveTools介绍">
+<meta property="og:url" content="http://devliubo.com/2017/2017-08-18-辅助开源工具ATAssistiveTools介绍.html">
 <meta property="og:site_name" content="Devliubo">
-<meta property="og:description" content="练习下写总结，整理下以前在配置git过程中的SSH-Key共存和移除submodule的方法~">
+<meta property="og:description" content="ATAssistiveTools 是一个辅助调试工具容器，提供了FakeLocation、SandboxViewer、DeviceLogs、GPSEmulator四个功能做示例。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-26T15:11:04.000Z">
+<meta property="og:updated_time" content="2018-08-18T05:41:19.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="配置git多SSH-Key共存">
-<meta name="twitter:description" content="练习下写总结，整理下以前在配置git过程中的SSH-Key共存和移除submodule的方法~">
+<meta name="twitter:title" content="辅助开源工具ATAssistiveTools介绍">
+<meta name="twitter:description" content="ATAssistiveTools 是一个辅助调试工具容器，提供了FakeLocation、SandboxViewer、DeviceLogs、GPSEmulator四个功能做示例。">
 
 
 
@@ -88,7 +88,7 @@
   };
 </script>
 
-  <title> 配置git多SSH-Key共存 | Devliubo </title>
+  <title> 辅助开源工具ATAssistiveTools介绍 | Devliubo </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -219,7 +219,7 @@
             
             
               
-                配置git多SSH-Key共存
+                辅助开源工具ATAssistiveTools介绍
               
             
           </h1>
@@ -231,8 +231,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-04-16T21:41:00+08:00" content="2015-04-16">
-              2015-04-16
+            <time itemprop="dateCreated" datetime="2017-08-18T13:12:22+08:00" content="2017-08-18">
+              2017-08-18
             </time>
           </span>
 
@@ -245,8 +245,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
                   </a>
                 </span>
 
@@ -261,8 +261,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html" itemprop="commentsCount"></span>
+                <a href="/2017/2017-08-18-辅助开源工具ATAssistiveTools介绍.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/2017-08-18-辅助开源工具ATAssistiveTools介绍.html" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -284,40 +284,48 @@
       
 
       
-        <p>练习下写总结，整理下以前在配置git过程中的SSH-Key共存和移除submodule的方法~</p>
+        <p>ATAssistiveTools 是一个辅助调试工具容器，提供了FakeLocation、SandboxViewer、DeviceLogs、GPSEmulator四个功能做示例。</p>
 <a id="more"></a>
-<h4 id="1-git的入门学习"><a href="#1-git的入门学习" class="headerlink" title="1.git的入门学习"></a>1.git的入门学习</h4><p>推荐廖雪峰的网站: <a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="noopener">http://www.liaoxuefeng.com</a></p>
-<h4 id="2-关于多个SSH-Key的共存"><a href="#2-关于多个SSH-Key的共存" class="headerlink" title="2.关于多个SSH Key的共存"></a>2.关于多个SSH Key的共存</h4><p>在使用git过程中，会遇到配置多个ssh-key的共存情况，比如一个连接公司的git，一个用来连接github，或者两个github账户。这里以github和oschina两个ssh-key共存举例。</p>
-<p>首先配置github，生成ssh-key</p>
-<blockquote><p>ssh-keygen -t rsa -C “<a href="mailto:aaa@gmail.com" target="_blank" rel="noopener">aaa@gmail.com</a>” -f ~/.ssh/github_id_rsa</p>
-</blockquote>
-<p>过程中会要求设置密码，直接回车为空就可以了~</p>
-<p>此时会生成两个文件github_id_rsa和github_id_rsa.pub<br>为了方便区分多个ssh-key，这里我们指定名为github_id_rsa，如果不指定会按照生成默认的id_rsa</p>
-<p>由于在默认情况下，SSH agent只会去读取id_rsa，为了使新生成的github_id_rsa能被SSH agent读取，将github_id_rsa添加到SSH agent</p>
-<blockquote><p>ssh-add ~/.ssh/github_id_rsa</p>
-</blockquote>
-<p>可以查看生成的ssh-key，将ssh-key粘贴到github上</p>
-<blockquote><p>vim ~/.ssh/github_id_rsa.pub</p>
-</blockquote>
-<p>用相同的方法生成oschina的ssh-key，并粘贴到oschina上</p>
-<p>之后为了让两个ssh-key共存，在~/.ssh下生成一个config文件</p>
-<blockquote><p>sudo vim ~/.ssh/config</p>
-</blockquote>
-<p>通过config文件指定不同的私钥对应的不同git服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#GitHub(aaa@gmail.com)</span><br><span class="line">Host github.com</span><br><span class="line">HostName github.com</span><br><span class="line">User git</span><br><span class="line">IdentityFile ~/.ssh/github_id_rsa</span><br><span class="line"></span><br><span class="line">#OSChina(bbb@gmail.com)</span><br><span class="line">Host git.oschina.net</span><br><span class="line">HostName git.oschina.net</span><br><span class="line">User git</span><br><span class="line">IdentityFile ~/.ssh/oschina_id_rsa</span><br></pre></td></tr></table></figure>
-<p>然后可以测试下是否成功连接</p>
-<blockquote><p>ssh -T github.com<br>ssh -T git.oschina.net</p>
-</blockquote>
-<p>过程中会问你是否添加到knownhosts，yes即可，会在~/.ssh目录下生成一个known_hosts文件</p>
-<p><strong>需要注意一点的是，git服务一般会根据配置文件的user.name和user.email来获取作者信息(比如上面的github的<a href="mailto:aaa@gmail.com" target="_blank" rel="noopener">aaa@gmail.com</a>和oschina的<a href="mailto:bbb@gmail.com" target="_blank" rel="noopener">bbb@gmail.com</a>)，如果多账户信息不同的话，需要注意在使用前修改配置。</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#查看配置信息</span><br><span class="line">git config --list</span><br><span class="line"></span><br><span class="line">#设置全局的name和email</span><br><span class="line">git config --global user.name &quot;xxx&quot;</span><br><span class="line">git config --global user.email &quot;xxx.gmail.com&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="3-git的submodule简单记录"><a href="#3-git的submodule简单记录" class="headerlink" title="3.git的submodule简单记录"></a>3.git的submodule简单记录</h4><p>增加一个submodule到项目比较简单，添加submodule到submodulePath目录下</p>
-<blockquote><p>git submodule add <a href="mailto:git@github.com" target="_blank" rel="noopener">git@github.com</a>:submodule.git submodulePath</p>
-</blockquote>
-<p>要特别记住的是：<strong>git是根据父项目中保存的submodule的commit id来跟踪submodule项目变动的，在多人项目中，pull和push时一定要注意父项目的commit id和submodule的对应</strong></p>
-<p>删除submodule要复杂点需要清除以下几个地方</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#移除submodule项目及对应目录</span><br><span class="line">git rm --cached submodulePath</span><br><span class="line">git rm -rf submodulePath</span><br><span class="line"></span><br><span class="line">#删除掉下面两个文件中要移除的submodule相关信息</span><br><span class="line">vim .gitmodules</span><br><span class="line">vim .git/config</span><br><span class="line"></span><br><span class="line">#将删除submodule的更改提交</span><br><span class="line">git add --all</span><br><span class="line">git commit -m “remove submodule&quot;</span><br></pre></td></tr></table></figure>
-<p><em>Ps:小索问我现在在北京觉得幸福么？被问得整个人都不好了，嗯，，，是个问题哈。。。。。。</em></p>
+<p>开源库地址：<a href="https://github.com/devliubo/ATAssistiveTools[https://github.com/devliubo/ATAssistiveTools]" target="_blank" rel="noopener">https://github.com/devliubo/ATAssistiveTools[https://github.com/devliubo/ATAssistiveTools]</a>, 欢迎star~</p>
+<h2 id="ATAssistiveTools"><a href="#ATAssistiveTools" class="headerlink" title="ATAssistiveTools"></a>ATAssistiveTools</h2><p>ATAssistiveTools 是一个辅助调试工具容器，包含收缩和扩展两个状态，扩展界面支持在任意时刻，加载任意的 custom view ，通过实现 ATCustomViewProtocol 协议，支持 custom view 获取 appear、 disappear、 shrink、 expand四种状态的 will 和 did 事件，以便进行特定逻辑处理，收缩界面外观显示效果仿照 iOS 系统的 AssistiveTouch 。</p>
+<p>收缩图例、扩展图例</p>
+<h2 id="ATCustomizeViews"><a href="#ATCustomizeViews" class="headerlink" title="ATCustomizeViews"></a>ATCustomizeViews</h2><p>ATCustomizeViews 目录中包含了以下的 custom view，一方面可以作为使用示例，另一方面也可以直接使用这些自定义界面的功能：</p>
+<ul>
+<li>ATFakeLocationView 虚拟定位</li>
+<li>ATSandboxViewerView 沙盒目录浏览</li>
+<li>ATDeviceLogsView 设备日志查看</li>
+<li>ATGPSEmulatorView 对指定的坐标串按特定速度进行模拟</li>
+</ul>
+<h2 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h2><h3 id="Manual"><a href="#Manual" class="headerlink" title="Manual"></a>Manual</h3><p>将ATAssistiveTools目录下载导入到工程中即可。<br>如果需要ATCustomizeViews，则需要下载ATCustomizeViews目录，导入到工程即可。</p>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><h3 id="使用-ATAssistiveTools"><a href="#使用-ATAssistiveTools" class="headerlink" title="使用 ATAssistiveTools"></a>使用 ATAssistiveTools</h3><ul>
+<li>导入头文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;ATAssistiveTools.h&quot;</span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">* 显示 ATAssistiveTools</span><br><span class="line"></span><br><span class="line">```  </span><br><span class="line">[[ATAssistiveTools sharedInstance] show];</span><br></pre></td></tr></table></figure>
+<h3 id="使用ATCustomizeViews"><a href="#使用ATCustomizeViews" class="headerlink" title="使用ATCustomizeViews"></a>使用ATCustomizeViews</h3><p>在显示 ATAssistiveTools 的基础上：</p>
+<ul>
+<li>导入头文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;ATDeviceLogsView.h&quot;</span><br><span class="line">#import &quot;ATFakeLocationView.h&quot;</span><br><span class="line">#import &quot;ATSandboxViewerView.h&quot;</span><br><span class="line">#import &quot;ATGPSEmulatorView.h&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>加载 ATCustomizeViews</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// add fake location view</span><br><span class="line">ATFakeLocationView *simLocView = [[ATFakeLocationView alloc] init];</span><br><span class="line">[[ATAssistiveTools sharedInstance] addCustomView:simLocView forTitle:@&quot;FakeLocation&quot;];</span><br><span class="line"></span><br><span class="line">// add sandbox viewer view</span><br><span class="line">ATSandboxViewerView *sandboxView = [[ATSandboxViewerView alloc] init];</span><br><span class="line">[[ATAssistiveTools sharedInstance] addCustomView:sandboxView forTitle:@&quot;SandboxViewer&quot;];</span><br><span class="line"></span><br><span class="line">// add device log view</span><br><span class="line">ATDeviceLogsView *logsView = [[ATDeviceLogsView alloc] init];</span><br><span class="line">[[ATAssistiveTools sharedInstance] addCustomView:logsView forTitle:@&quot;DeviceLog&quot;];</span><br><span class="line"></span><br><span class="line">// add GPS emulator view</span><br><span class="line">ATGPSEmulatorView *emulatorView = [[ATGPSEmulatorView alloc] init];</span><br><span class="line">[[ATAssistiveTools sharedInstance] addCustomView:emulatorView forTitle:@&quot;GPSEmulator&quot;];</span><br></pre></td></tr></table></figure>
+<h3 id="自定义界面"><a href="#自定义界面" class="headerlink" title="自定义界面"></a>自定义界面</h3><p>如果想自定义界面，需要让custom view实现 ATCustomViewProtocol 协议：</p>
+<ul>
+<li>导入头文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;ATCustomViewProtocol.h&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使界面实现 ATCustomViewProtocol 协议</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@interface ACustomView : UIView &lt;ATCustomViewProtocol&gt;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h2 id="To-Do"><a href="#To-Do" class="headerlink" title="To Do"></a>To Do</h2><ul>
+<li>收缩状态支持显示custom view ，支持显示 custom title</li>
+<li>增加生成 framework 的 target ，打包成 static library</li>
+<li>增加 podspec 文件，支持使用 cocoapods 安装 </li>
+</ul>
+<h2 id="Notice"><a href="#Notice" class="headerlink" title="Notice"></a>Notice</h2><p>不建议用于性能相关的调试，虽然 ATAssistiveTools 本身对性能影响很小，但加载的 custom view 有可能对内存、CPU以及网络造成过大的占用，会导致结论的不严谨和不准确。</p>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>ATAssistiveTools is released under the <a href="">MIT License</a>.</p>
 
       
     </div>
@@ -332,7 +340,13 @@
       
         <div class="post-tags">
           
-            <a href="/tags/git/" rel="tag">#git</a>
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/UIKit/" rel="tag">#UIKit</a>
+          
+            <a href="/tags/Sandbox/" rel="tag">#Sandbox</a>
+          
+            <a href="/tags/FackGPS/" rel="tag">#FackGPS</a>
           
         </div>
       
@@ -341,17 +355,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/2015-03-18-zhong-zhui-biao-da-shi-zhuan-hou-zhui-biao-da-shi.html" rel="next" title="中缀表达式转后缀表达式">
-                <i class="fa fa-chevron-left"></i> 中缀表达式转后缀表达式
+              <a href="/2017/2017-07-14-AdvancedAnimationsWithUIKit-WWDC2017-Session230.html" rel="next" title="Advanced Animations With UIKit(WWDC2017-Session230)">
+                <i class="fa fa-chevron-left"></i> Advanced Animations With UIKit(WWDC2017-Session230)
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/2015-05-07-message-forwarding.html" rel="prev" title="Message Forwarding">
-                Message Forwarding <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -503,7 +513,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-git的入门学习"><span class="nav-number">1.</span> <span class="nav-text">1.git的入门学习</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-关于多个SSH-Key的共存"><span class="nav-number">2.</span> <span class="nav-text">2.关于多个SSH Key的共存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-git的submodule简单记录"><span class="nav-number">3.</span> <span class="nav-text">3.git的submodule简单记录</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ATAssistiveTools"><span class="nav-number">1.</span> <span class="nav-text">ATAssistiveTools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ATCustomizeViews"><span class="nav-number">2.</span> <span class="nav-text">ATCustomizeViews</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Installation"><span class="nav-number">3.</span> <span class="nav-text">Installation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Manual"><span class="nav-number">3.1.</span> <span class="nav-text">Manual</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Usage"><span class="nav-number">4.</span> <span class="nav-text">Usage</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-ATAssistiveTools"><span class="nav-number">4.1.</span> <span class="nav-text">使用 ATAssistiveTools</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用ATCustomizeViews"><span class="nav-number">4.2.</span> <span class="nav-text">使用ATCustomizeViews</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义界面"><span class="nav-number">4.3.</span> <span class="nav-text">自定义界面</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#To-Do"><span class="nav-number">5.</span> <span class="nav-text">To Do</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Notice"><span class="nav-number">6.</span> <span class="nav-text">Notice</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#License"><span class="nav-number">7.</span> <span class="nav-text">License</span></a></li></ol></div>
             
           </div>
         </section>
@@ -611,9 +621,9 @@
 
     <script type="text/javascript">
       var disqus_shortname = 'devliubo';
-      var disqus_identifier = '2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html';
-      var disqus_title = '配置git多SSH-Key共存';
-      var disqus_url = 'http://devliubo.com/2015/2015-04-16-pei-zhi-gitduo-ssh-keygong-cun.html';
+      var disqus_identifier = '2017/2017-08-18-辅助开源工具ATAssistiveTools介绍.html';
+      var disqus_title = '辅助开源工具ATAssistiveTools介绍';
+      var disqus_url = 'http://devliubo.com/2017/2017-08-18-辅助开源工具ATAssistiveTools介绍.html';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');

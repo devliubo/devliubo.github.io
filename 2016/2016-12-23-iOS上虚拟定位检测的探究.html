@@ -60,12 +60,14 @@
 
 
 <meta name="description" content="最近收到了好多莫名奇妙的crash反馈，仔细分析后发现这些crash发生在越狱机的虚拟定位插件上，一般这种crash发生在虚拟定位插件的dylib内，根本无法去调试。想要避免这种crash是不可能了，只能针对使用虚拟定位的情况进行一些检测，然后去给出风险提示，所以对这部分内容进行了一些研究和探索。">
+<meta name="keywords" content="iOS,CoreLoation,虚拟定位,FakeGPS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS上虚拟定位检测的探究">
 <meta property="og:url" content="http://devliubo.com/2016/2016-12-23-iOS上虚拟定位检测的探究.html">
 <meta property="og:site_name" content="Devliubo">
 <meta property="og:description" content="最近收到了好多莫名奇妙的crash反馈，仔细分析后发现这些crash发生在越狱机的虚拟定位插件上，一般这种crash发生在虚拟定位插件的dylib内，根本无法去调试。想要避免这种crash是不可能了，只能针对使用虚拟定位的情况进行一些检测，然后去给出风险提示，所以对这部分内容进行了一些研究和探索。">
-<meta property="og:updated_time" content="2017-08-18T17:07:54.000Z">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-26T15:11:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS上虚拟定位检测的探究">
 <meta name="twitter:description" content="最近收到了好多莫名奇妙的crash反馈，仔细分析后发现这些crash发生在越狱机的虚拟定位插件上，一般这种crash发生在虚拟定位插件的dylib内，根本无法去调试。想要避免这种crash是不可能了，只能针对使用虚拟定位的情况进行一些检测，然后去给出风险提示，所以对这部分内容进行了一些研究和探索。">
@@ -285,7 +287,7 @@
         <p>最近收到了好多莫名奇妙的crash反馈，仔细分析后发现这些crash发生在越狱机的虚拟定位插件上，一般这种crash发生在虚拟定位插件的dylib内，根本无法去调试。想要避免这种crash是不可能了，只能针对使用虚拟定位的情况进行一些检测，然后去给出风险提示，所以对这部分内容进行了一些研究和探索。</p>
 <a id="more"></a>
 <h2 id="目前遇到的情况"><a href="#目前遇到的情况" class="headerlink" title="目前遇到的情况"></a>目前遇到的情况</h2><p>首先是去查询下crash所在的xxx.dylib，基本都是一些虚拟定位插件的dylib，因为发生在第三方的dylib内，根本无法去进行Debug。还有一些是通过将ipa砸壳进行动态库注入，然后重签名安装到非越狱机上，也可以实现修改位置的效果。最近“阴阳师”的流行也催生了另外一种方法，借助于iOS系统本身的模拟位置功能。</p>
-<p>因为我本身也不是专业做移动安全的，思路和方法基本上来自于各种Google，也看了很多比如 <a href="http://iosre.com/" target="_blank" rel="external">iosre.com</a> 等一些逆向相关的网站和教程，所以思路和方法不一定完全正确，如有问题还希望懂安全的大神们指出。</p>
+<p>因为我本身也不是专业做移动安全的，思路和方法基本上来自于各种Google，也看了很多比如 <a href="http://iosre.com/" target="_blank" rel="noopener">iosre.com</a> 等一些逆向相关的网站和教程，所以思路和方法不一定完全正确，如有问题还希望懂安全的大神们指出。</p>
 <h2 id="常见的iOS端虚拟定位方式"><a href="#常见的iOS端虚拟定位方式" class="headerlink" title="常见的iOS端虚拟定位方式"></a>常见的iOS端虚拟定位方式</h2><p>首先介绍下目前见到过的虚拟定位的方式，主要有以下三种方式：</p>
 <ol>
 <li><p>通过各种方式找到CLLocationManager的delegate的locationManager:didUpdateLocations:回调方法实现并进行hook，然后仅修改回调的参数CLLocation的coordiante数值，其他数值保持不变。</p>
@@ -342,7 +344,7 @@
 <li><p>检测implemention的方式还可以避免掉一个坑，因为都是借助于runtime去hook目标函数，开发过程中在源代码中进行类似的处理，也可以造成虚拟定位的效果。但此时无论你如何利用MethodSwizzling，最终替换的新implemention还是与原始implemention所在的module一致，这样就避免掉自己给CLLocation加了个分类，然后override了coordiante的get方法，被错误识别成存在虚拟定位的尴尬。</p>
 </li>
 </ul>
-<h2 id="检测虚拟定位用到的方法"><a href="#检测虚拟定位用到的方法" class="headerlink" title="检测虚拟定位用到的方法"></a>检测虚拟定位用到的方法</h2><p><strong>dladdr函数，去获取方法的实现所在的模块，可以参考Apple的官方文档中对dladdr函数的介绍： <a href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/dladdr.3.html" target="_blank" rel="external">dladdr函数</a></strong></p>
+<h2 id="检测虚拟定位用到的方法"><a href="#检测虚拟定位用到的方法" class="headerlink" title="检测虚拟定位用到的方法"></a>检测虚拟定位用到的方法</h2><p><strong>dladdr函数，去获取方法的实现所在的模块，可以参考Apple的官方文档中对dladdr函数的介绍： <a href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/dladdr.3.html" target="_blank" rel="noopener">dladdr函数</a></strong></p>
 <h2 id="检测方法的代码示例"><a href="#检测方法的代码示例" class="headerlink" title="检测方法的代码示例"></a>检测方法的代码示例</h2><p><code>引入头文件</code></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">#import &lt;dlfcn.h&gt;</span><br></pre></td></tr></table></figure>
 <p><code>获取一个方法所在的模块信息</code></p>
@@ -467,7 +469,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -484,7 +486,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -563,7 +565,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

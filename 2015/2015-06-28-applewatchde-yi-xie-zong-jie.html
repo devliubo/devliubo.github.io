@@ -60,17 +60,19 @@
 
 
 <meta name="description" content="经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~">
+<meta name="keywords" content="AppleWatch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AppleWatch的一些总结">
 <meta property="og:url" content="http://devliubo.com/2015/2015-06-28-applewatchde-yi-xie-zong-jie.html">
 <meta property="og:site_name" content="Devliubo">
 <meta property="og:description" content="经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/TargetStructure.png">
 <meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/WatchAndiPhone.png">
 <meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/HiddenAndAlpha.png">
 <meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/LifeCycle1.png">
 <meta property="og:image" content="http://devliubo.com/images/2015-06-28-applewatchde-yi-xie-zong-jie/LifeCycle2.png">
-<meta property="og:updated_time" content="2017-08-18T17:07:54.000Z">
+<meta property="og:updated_time" content="2017-09-26T15:11:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AppleWatch的一些总结">
 <meta name="twitter:description" content="经过一段时间对AppleWatch的使用，简单去总结下在AppleWatch开发时的一些知识点~">
@@ -317,13 +319,20 @@
 <p>WatchKitExtension发送来的请求将会在这个回调中收到，可以根据第二个参数userInfo所携带的内容进行相应地处理，之后将处理的结果放到一个Dictionary中，通过名为reply的Block返回给WatchKitExtension，从而完成了一次请求与相应</p>
 <blockquote>
 <p>对这个过程有三点需要注意：</p>
+</blockquote>
+<blockquote>
 <ul>
-<li><p>openParentApplication:reply的userInfo不可以为nil，为nil不会在iOSApp中收到请求</p>
-</li>
-<li><p>如果收到请求时，iOSApp没有启动，会使iOSApp以后台模式运行</p>
-</li>
-<li><p>如果WatchKitExtension快速连续的发送大量的请求，iOS会将所有的请求按发送顺序阻塞，直到前一个请求得到响应后，才会发送下一个</p>
-</li>
+<li>openParentApplication:reply的userInfo不可以为nil，为nil不会在iOSApp中收到请求</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>如果收到请求时，iOSApp没有启动，会使iOSApp以后台模式运行</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>如果WatchKitExtension快速连续的发送大量的请求，iOS会将所有的请求按发送顺序阻塞，直到前一个请求得到响应后，才会发送下一个</li>
 </ul>
 </blockquote>
 <p><strong>第二种：</strong>需要借助App Group去共享数据，App Group相当于一个容器，他允许同一个Group内的不同App去在其中读写文件，通过这些文件，将数据在不同的App间实现共享</p>
@@ -367,12 +376,12 @@
 <ol>
 <li>主要的生命周期中的方法有四个：</li>
 </ol>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)init;</span><br><span class="line">- (<span class="keyword">void</span>)awakeWithContext:(<span class="keyword">id</span>)context;  <span class="comment">//类似于viewDidLoad方法</span></span><br><span class="line">- (<span class="keyword">void</span>)willActivate;    				<span class="comment">//类似于viewWillAppear方法</span></span><br><span class="line">- (<span class="keyword">void</span>)didDeactivate;    			    <span class="comment">//类似于viewDidDisappear方法</span></span><br></pre></td></tr></table></figure>
-<ol>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)init;</span><br><span class="line">- (<span class="keyword">void</span>)awakeWithContext:(<span class="keyword">id</span>)context;  <span class="comment">//类似于viewDidLoad方法</span></span><br><span class="line">- (<span class="keyword">void</span>)willActivate;    				<span class="comment">//类似于viewWillAppear方法</span></span><br><span class="line">- (<span class="keyword">void</span>)didDeactivate;    			    <span class="comment">//类似于viewDidDisappear方法</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
 <li>WatchKit有三种界面的组织方式：分页方式、栈导航方式、model方式；三种方式提供的方法如下：</li>
 </ol>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//栈导航方式</span></span><br><span class="line">- (<span class="keyword">void</span>)pushControllerWithName:(<span class="built_in">NSString</span> *)name context:(<span class="keyword">id</span>)context;</span><br><span class="line">- (<span class="keyword">void</span>)popController;</span><br><span class="line">- (<span class="keyword">void</span>)popToRootController;</span><br><span class="line"></span><br><span class="line"><span class="comment">//分页方式</span></span><br><span class="line">+ (<span class="keyword">void</span>)reloadRootControllersWithNames:(<span class="built_in">NSArray</span> *)names contexts:(<span class="built_in">NSArray</span> *)contexts;</span><br><span class="line">- (<span class="keyword">void</span>)becomeCurrentPage;</span><br><span class="line"></span><br><span class="line"><span class="comment">//model方式</span></span><br><span class="line">- (<span class="keyword">void</span>)presentControllerWithName:(<span class="built_in">NSString</span> *)name context:(<span class="keyword">id</span>)context;</span><br><span class="line">- (<span class="keyword">void</span>)presentControllerWithNames:(<span class="built_in">NSArray</span> *)names contexts:(<span class="built_in">NSArray</span> *)contexts;</span><br><span class="line">- (<span class="keyword">void</span>)dismissController;</span><br></pre></td></tr></table></figure>
-<ol>
+<ol start="3">
 <li>在各个WKInterfaceController之间传递数据是很方便的，在上面说到的切换方法中都会有一个context参数，可以用来传递数据</li>
 </ol>
 <h2 id="WatchKit-控件"><a href="#WatchKit-控件" class="headerlink" title="WatchKit 控件"></a>WatchKit 控件</h2><ol>
@@ -500,7 +509,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -517,7 +526,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -596,7 +605,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

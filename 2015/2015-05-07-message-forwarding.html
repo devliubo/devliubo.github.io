@@ -60,12 +60,14 @@
 
 
 <meta name="description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
+<meta name="keywords" content="runtime">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Message Forwarding">
 <meta property="og:url" content="http://devliubo.com/2015/2015-05-07-message-forwarding.html">
 <meta property="og:site_name" content="Devliubo">
 <meta property="og:description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
-<meta property="og:updated_time" content="2017-08-18T17:07:54.000Z">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-26T15:11:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Message Forwarding">
 <meta name="twitter:description" content="好脑子不如烂笔头，整理下关于iOS-Runtime中的消息和消息转发机制~">
@@ -292,8 +294,14 @@
 <p>如官方文档所说:</p>
 <blockquote>
 <p>The messaging function does everything necessary for dynamic binding:</p>
+</blockquote>
+<blockquote>
 <p>It first finds the procedure (method implementation) that the selector refers to. Since the same method can be implemented differently by separate classes, the precise procedure that it finds depends on the class of the receiver.</p>
+</blockquote>
+<blockquote>
 <p>It then calls the procedure, passing it the receiving object (a pointer to its data), along with any arguments that were specified for the method.</p>
+</blockquote>
+<blockquote>
 <p>Finally, it passes on the return value of the procedure as its own return value.</p>
 </blockquote>
 <p>其中第一步的查找过程主要包含以下几个步骤：</p>
@@ -323,8 +331,14 @@
 <p> 可以在这个方法中去寻找可以响应消息的对象，之后通过改变<strong>NSInvocation</strong>的<strong>target</strong>去转发消息</p>
 <blockquote>
 <p><strong>需要注意:</strong>在该方法调用前，为了生成message对应的NSInvocation，需要重载方法:</p>
+</blockquote>
+<blockquote>
 <p><strong>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;</strong></p>
+</blockquote>
+<blockquote>
 <p>去生成selector对应的方法签名</p>
+</blockquote>
+<blockquote>
 <p>因为包含了生成方法签名和NSInvocation的过程，所以被形容为比forwardingTargetForSelecter:代价更大</p>
 </blockquote>
 </li>
@@ -336,7 +350,7 @@
 <p> <strong>- (BOOL)isKindOfClass:(Class)aClass;</strong></p>
 </li>
 </ol>
-<p><a href="https://git.oschina.net/bomylib/MessageForwarding.git" target="_blank" rel="external">OSChina:MessageForwarding</a></p>
+<p><a href="https://git.oschina.net/bomylib/MessageForwarding.git" target="_blank" rel="noopener">OSChina:MessageForwarding</a></p>
 
       
     </div>
@@ -445,7 +459,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -462,7 +476,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -541,7 +555,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
